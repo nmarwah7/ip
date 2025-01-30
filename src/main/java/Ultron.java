@@ -2,6 +2,9 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Ultron {
+    /**
+     * Displays a standard error message if user tries to mark or unmark a task with index out of bound for the task list
+     */
     public static void outOfBoundsMessage(){
         System.out.println("-".repeat(120));
         System.out.println("So you think you're funny? You don't even have that many tasks. Out of bounds.");
