@@ -45,7 +45,7 @@ public class Ultron {
                 //checking for unmark before mark to avoid it being mistakenly identified as just "mark"
                 String stringTaskNumber = line.split(" ")[1];
                 int taskNumber = Integer.parseInt(stringTaskNumber)-1;
-                if(taskNumber>=Task.taskCount){
+                if(taskNumber>=Task.taskCount||taskNumber<0){
                     outOfBoundsMessage();
                 }else {
                     taskList[taskNumber].setDone(false);
@@ -57,7 +57,7 @@ public class Ultron {
             }else if (line.contains("mark")) {
                 String stringTaskNumber = line.split(" ")[1];
                 int taskNumber = Integer.parseInt(stringTaskNumber)-1;
-                if(taskNumber>=Task.taskCount){
+                if(taskNumber>=Task.taskCount||taskNumber<0){
                     outOfBoundsMessage();
                 }else {
                     taskList[taskNumber].setDone(true);
