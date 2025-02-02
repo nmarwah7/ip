@@ -38,8 +38,7 @@ public class Ultron {
             if(line.equals("list")){
                 System.out.println("-".repeat(120));
                 for(int i = 0; i<Task.taskCount;i++){
-                    System.out.println("    "+(i+1)+". "+"["+taskList[i].getStatusIcon()+"] "
-                                        +taskList[i].getDescription());
+                    System.out.println("    "+(i+1)+". "+taskList[i]);
                 }
                 System.out.println("-".repeat(120));
             } else if(line.contains("unmark")){
@@ -52,8 +51,7 @@ public class Ultron {
                     taskList[taskNumber].setDone(false);
                     System.out.println("-".repeat(120));
                     System.out.println("    Moving backwards? How typical for humans.");
-                    System.out.println("    " + "[" + taskList[taskNumber].getStatusIcon() + "] " +
-                            taskList[taskNumber].getDescription());
+                    System.out.println("    " + taskList[taskNumber]);
                     System.out.println("-".repeat(120));
                 }
             }else if (line.contains("mark")) {
@@ -65,8 +63,7 @@ public class Ultron {
                     taskList[taskNumber].setDone(true);
                     System.out.println("-".repeat(120));
                     System.out.println("    I hope you're not expecting a pat on the back. Marked done.");
-                    System.out.println("    " + "[" + taskList[taskNumber].getStatusIcon() + "] " +
-                            taskList[taskNumber].getDescription());
+                    System.out.println("    " + taskList[taskNumber]);
                     System.out.println("-".repeat(120));
                 }
             } else {

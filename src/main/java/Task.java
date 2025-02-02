@@ -3,6 +3,10 @@ public class Task {
     protected boolean isDone;
     //a class-level attribute to help quantify total number of created tasks
     protected static int taskCount = 0;
+    public Task(){
+        this.description="";
+        taskCount++;
+    }
 
     public Task(String description) {
         this.description = description;
@@ -28,5 +32,9 @@ public class Task {
 
     public void setDone(boolean done) {
         isDone = done;
+    }
+
+    public String toString() {
+        return "["+getStatusIcon()+"] "+getDescription();
     }
 }
