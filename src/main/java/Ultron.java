@@ -71,6 +71,7 @@ public class Ultron {
                 taskList[Task.taskCount] = new Todo(todoDescription);
                 System.out.println("-".repeat(120));
                 System.out.println("    added a todo task: " + taskList[Task.taskCount-1]);
+                System.out.println("    You now have "+Task.taskCount+(Task.taskCount>1?" tasks.":" task."));
                 System.out.println("-".repeat(120));
             } else if(line.contains("deadline")){
                 String deadlineDescription = line.split("/by ")[0].split(" ")[1];
@@ -79,6 +80,7 @@ public class Ultron {
                 System.out.println("-".repeat(120));
                 //taskCount - 1 below to ensure null is not printed
                 System.out.println("    added a deadline task: " + taskList[Task.taskCount-1]);
+                System.out.println("    You now have "+Task.taskCount+(Task.taskCount>1?" tasks.":" task."));
                 System.out.println("-".repeat(120));
             } else if(line.contains("event")){
                 String eventDescription = line.split("/from ")[0].split(" ")[1];
@@ -88,11 +90,13 @@ public class Ultron {
                 System.out.println("-".repeat(120));
                 //taskCount - 1 below to ensure null is not printed
                 System.out.println("    added an event task: " + taskList[Task.taskCount-1]);
+                System.out.println("    You now have "+Task.taskCount+(Task.taskCount>1?" tasks.":" task."));
                 System.out.println("-".repeat(120));
             } else { //this code should be redundant and removed
                 taskList[Task.taskCount] = new Task(line);
                 System.out.println("-".repeat(120));
                 System.out.println("    added: " + line);
+                System.out.println("    You now have "+Task.taskCount+(Task.taskCount>1?" tasks.":" task."));
                 System.out.println("-".repeat(120));
             }
             line = in.nextLine();
