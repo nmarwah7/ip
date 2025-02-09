@@ -2,6 +2,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Ultron {
+    //the below face ASCII art was obtained through help of ChatGPT who was provided the prompt: "give me
+    //an Ultron face art in text" and the first output was used
     public static final String ULTRON_FACE = """
                    ______
                 .-'      `-.
@@ -23,60 +25,94 @@ public class Ultron {
         helloMessage();
         Scanner in = new Scanner(System.in);
         String line = in.nextLine();
-        while(!line.equals("bye")){
-            if(line.equals("list")){
+        String command = line.split(" ",2)[0];
+        //the below switch-case refactoring is inspired by @James17042002
+        while(!command.equals("bye")){
+            switch (command){
+            case "list":
                 dashLine();
-                for(int i = 0; i<Task.taskCount;i++){
-                    System.out.println("    "+(i+1)+". "+taskList[i]);
-                }
+                printTaskList(taskList);
                 dashLine();
-            } else if(line.contains("unmark")){
-                //checking for unmark before mark to avoid it being mistakenly identified as just "mark"
-                String stringTaskNumber = line.split(" ")[1];
-                int taskNumber = Integer.parseInt(stringTaskNumber)-1;
-                if(taskNumber>=Task.taskCount||taskNumber<0){
-                    outOfBoundsMessage();
-                }else {
-                    taskList[taskNumber].setDone(false);
-                    dashLine();
-                    System.out.println("    Moving backwards? How typical for humans.");
-                    System.out.println("    " + taskList[taskNumber]);
-                    dashLine();
-                }
-            }else if (line.contains("mark")) {
-                String stringTaskNumber = line.split(" ")[1];
-                int taskNumber = Integer.parseInt(stringTaskNumber)-1;
-                if(taskNumber>=Task.taskCount||taskNumber<0){
-                    outOfBoundsMessage();
-                }else {
-                    taskList[taskNumber].setDone(true);
-                    dashLine();
-                    System.out.println("    I hope you're not expecting a pat on the back. Marked done.");
-                    System.out.println("    " + taskList[taskNumber]);
-                    dashLine();
-                }
-            }else if(line.contains("todo")){
-                String todoDescription = line.split(" ",2)[1];
-                taskList[Task.taskCount] = new Todo(todoDescription);
+                break;
+            case "mark":
+                handleMark(line, taskList);
+                break;
+            case "unmark":
+                handleUnmark(line, taskList);
+                break;
+            case "todo":
+                handleTodo(line, taskList);
                 taskAddedMessage(taskList, " todo ");
-            } else if(line.contains("deadline")){
-                String deadlineDescription = line.split("/by ")[0].split(" ")[1];
-                String deadlineBy = line.split("/by ")[1];
-                taskList[Task.taskCount] = new Deadline(deadlineDescription, deadlineBy);
+                break;
+            case "deadline":
+                handleDeadline(line, taskList);
                 taskAddedMessage(taskList, " deadline ");
-            } else if(line.contains("event")){
-                String eventDescription = line.split("/from ")[0].split(" ")[1];
-                String eventFrom = line.split("/from ")[1].split("/to ")[0];
-                String eventTo = line.split("/from ")[1].split("/to ")[1];
-                taskList[Task.taskCount] = new Event(eventDescription, eventFrom, eventTo);
+                break;
+            case "event":
+                handleEvent(line, taskList);
                 taskAddedMessage(taskList, " event ");
-            } else { //this code should be redundant and removed
+                break;
+            default:
                 taskList[Task.taskCount] = new Task(line);
                 taskAddedMessage(taskList, " ");
+                break;
             }
             line = in.nextLine();
+            command = line.split(" ",2)[0];
         }
         byeMessage();
+    }
+
+    private static void handleEvent(String line, Task[] taskList) {
+        String eventDescription = line.split("/from ")[0].split("event", 2)[1].trim();
+        String eventFrom = line.split("/from ")[1].split("/to ")[0];
+        String eventTo = line.split("/from ")[1].split("/to ")[1];
+        taskList[Task.taskCount] = new Event(eventDescription, eventFrom, eventTo);
+    }
+
+    private static void handleDeadline(String line, Task[] taskList) {
+        String deadlineDescription = line.split("/by ")[0].split("deadline", 2)[1].trim();
+        String deadlineBy = line.split("/by ")[1];
+        taskList[Task.taskCount] = new Deadline(deadlineDescription, deadlineBy);
+    }
+
+    private static void handleTodo(String line, Task[] taskList) {
+        String todoDescription = line.split(" ",2)[1];
+        taskList[Task.taskCount] = new Todo(todoDescription);
+    }
+
+    private static void handleUnmark(String line, Task[] taskList) {
+        String stringTaskNumber = line.split(" ")[1];
+        int taskNumber = Integer.parseInt(stringTaskNumber)-1;
+        if(taskNumber>=Task.taskCount||taskNumber<0){
+            outOfBoundsMessage();
+        }else {
+            taskList[taskNumber].setDone(false);
+            dashLine();
+            System.out.println("    Moving backwards? How typical for humans.");
+            System.out.println("    " + taskList[taskNumber]);
+            dashLine();
+        }
+    }
+
+    private static void handleMark(String line, Task[] taskList) {
+        String stringTaskNumber = line.split(" ")[1];
+        int taskNumber = Integer.parseInt(stringTaskNumber)-1;
+        if(taskNumber>=Task.taskCount||taskNumber<0){
+            outOfBoundsMessage();
+        }else {
+            taskList[taskNumber].setDone(true);
+            dashLine();
+            System.out.println("    I hope you're not expecting a pat on the back. Marked done.");
+            System.out.println("    " + taskList[taskNumber]);
+            dashLine();
+        }
+    }
+
+    private static void printTaskList(Task[] taskList) {
+        for(int i = 0; i<Task.taskCount;i++){
+            System.out.println("    "+(i+1)+". "+ taskList[i]);
+        }
     }
 
     private static void taskAddedMessage(Task[] taskList, String taskType) {
