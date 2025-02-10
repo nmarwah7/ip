@@ -19,7 +19,7 @@ public class Ultron {
             """;
     public static final int DASH_LINE_WIDTH = 120;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws unspecifiedCommandException {
         Task[] taskList = new Task[100];
         System.out.println(ULTRON_FACE);
         helloMessage();
@@ -28,39 +28,57 @@ public class Ultron {
         String command = line.split(" ",2)[0];
         //the below switch-case refactoring is inspired by @James17042002
         while(!command.equals("bye")){
-            switch (command){
-            case "list":
-                dashLine();
-                printTaskList(taskList);
-                dashLine();
-                break;
-            case "mark":
-                handleMark(line, taskList);
-                break;
-            case "unmark":
-                handleUnmark(line, taskList);
-                break;
-            case "todo":
-                handleTodo(line, taskList);
-                taskAddedMessage(taskList, " todo ");
-                break;
-            case "deadline":
-                handleDeadline(line, taskList);
-                taskAddedMessage(taskList, " deadline ");
-                break;
-            case "event":
-                handleEvent(line, taskList);
-                taskAddedMessage(taskList, " event ");
-                break;
-            default:
-                taskList[Task.taskCount] = new Task(line);
-                taskAddedMessage(taskList, " ");
-                break;
+            try {
+                switch (command){
+                case "list":
+                    dashLine();
+                    printTaskList(taskList); //add checked error of your own type for empty list
+                    dashLine();
+                    break;
+                case "mark":
+                    handleMark(line, taskList); //add checked error your own type for already marked + empty
+                    break;
+                case "unmark":
+                    handleUnmark(line, taskList);
+                    break;
+                case "todo":
+                    try {
+                        handleTodo(line, taskList);
+                        taskAddedMessage(taskList, " todo ");
+                    } catch (ArrayIndexOutOfBoundsException | invalidTodoCommandException e) {
+                        todoDescriptionErrorMessage();
+                    }
+                    break;
+                case "deadline":
+                    handleDeadline(line, taskList);
+                    taskAddedMessage(taskList, " deadline ");
+                    break;
+                case "event":
+                    handleEvent(line, taskList);
+                    taskAddedMessage(taskList, " event ");
+                    break;
+                default:
+                    throw new unspecifiedCommandException();
+                }
+            } catch (unspecifiedCommandException e) {
+                unspecifiedCommandErrorMessage();
             }
             line = in.nextLine();
             command = line.split(" ",2)[0];
         }
         byeMessage();
+    }
+
+    private static void unspecifiedCommandErrorMessage() {
+        dashLine();
+        System.out.println("    This is not a valid command. I only answer to predefined logical commands.");
+        dashLine();
+    }
+
+    private static void todoDescriptionErrorMessage() {
+        dashLine();
+        System.out.println("    todo what?! Say something. todo cannot have a blank description.");
+        dashLine();
     }
 
     private static void handleEvent(String line, Task[] taskList) {
@@ -76,35 +94,52 @@ public class Ultron {
         taskList[Task.taskCount] = new Deadline(deadlineDescription, deadlineBy);
     }
 
-    private static void handleTodo(String line, Task[] taskList) {
+    private static void handleTodo(String line, Task[] taskList) throws invalidTodoCommandException {
         String todoDescription = line.split(" ",2)[1];
+        if(todoDescription.trim().isEmpty()){
+            throw new invalidTodoCommandException();
+        }
         taskList[Task.taskCount] = new Todo(todoDescription);
     }
 
     private static void handleUnmark(String line, Task[] taskList) {
-        String stringTaskNumber = line.split(" ")[1];
-        int taskNumber = Integer.parseInt(stringTaskNumber)-1;
-        if(taskNumber>=Task.taskCount||taskNumber<0){
-            outOfBoundsMessage();
-        }else {
-            taskList[taskNumber].setDone(false);
+        try {
+            String stringTaskNumber = line.split(" ")[1];
+            int taskNumber = Integer.parseInt(stringTaskNumber)-1;
+            if(taskNumber>=Task.taskCount||taskNumber<0){
+                outOfBoundsMessage();
+            }else {
+                taskList[taskNumber].setDone(false);
+                dashLine();
+                System.out.println("    Moving backwards? How typical for humans.");
+                System.out.println("    " + taskList[taskNumber]);
+                dashLine();
+            }
+        } catch (NumberFormatException e) {
             dashLine();
-            System.out.println("    Moving backwards? How typical for humans.");
-            System.out.println("    " + taskList[taskNumber]);
+            System.out.println("    This is not a valid command. Type in command unmark x where x is a valid " +
+                                "task number.");
             dashLine();
         }
     }
 
     private static void handleMark(String line, Task[] taskList) {
-        String stringTaskNumber = line.split(" ")[1];
-        int taskNumber = Integer.parseInt(stringTaskNumber)-1;
-        if(taskNumber>=Task.taskCount||taskNumber<0){
-            outOfBoundsMessage();
-        }else {
-            taskList[taskNumber].setDone(true);
+        try {
+            String stringTaskNumber = line.split(" ")[1];
+            int taskNumber = Integer.parseInt(stringTaskNumber)-1;
+            if(taskNumber>=Task.taskCount||taskNumber<0){
+                outOfBoundsMessage();
+            }else {
+                taskList[taskNumber].setDone(true);
+                dashLine();
+                System.out.println("    I hope you're not expecting a pat on the back. Marked done.");
+                System.out.println("    " + taskList[taskNumber]);
+                dashLine();
+            }
+        } catch (NumberFormatException e) {
             dashLine();
-            System.out.println("    I hope you're not expecting a pat on the back. Marked done.");
-            System.out.println("    " + taskList[taskNumber]);
+            System.out.println("    This is not a valid command. Type in command mark x where x is a valid " +
+                    "task number.");
             dashLine();
         }
     }
