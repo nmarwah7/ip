@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Ultron {
@@ -19,7 +18,7 @@ public class Ultron {
             """;
     public static final int DASH_LINE_WIDTH = 120;
 
-    public static void main(String[] args) throws unspecifiedCommandException {
+    public static void main(String[] args){
         Task[] taskList = new Task[100];
         System.out.println(ULTRON_FACE);
         helloMessage();
@@ -32,30 +31,24 @@ public class Ultron {
                 switch (command){
                 case "list":
                     dashLine();
-                    printTaskList(taskList); //add checked error of your own type for empty list
+                    printTaskList(taskList);
                     dashLine();
                     break;
                 case "mark":
-                    handleMark(line, taskList); //add checked error your own type for already marked + empty
+                    handleMark(line, taskList);
                     break;
                 case "unmark":
                     handleUnmark(line, taskList);
                     break;
                 case "todo":
-                    try {
-                        handleTodo(line, taskList);
-                        taskAddedMessage(taskList, " todo ");
-                    } catch (ArrayIndexOutOfBoundsException | invalidTodoCommandException e) {
-                        todoDescriptionErrorMessage();
-                    }
+                    //error-handling within the handle function
+                    handleTodo(line, taskList);
                     break;
                 case "deadline":
                     handleDeadline(line, taskList);
-                    taskAddedMessage(taskList, " deadline ");
                     break;
                 case "event":
                     handleEvent(line, taskList);
-                    taskAddedMessage(taskList, " event ");
                     break;
                 default:
                     throw new unspecifiedCommandException();
@@ -80,31 +73,65 @@ public class Ultron {
         System.out.println("    todo what?! Say something. todo cannot have a blank description.");
         dashLine();
     }
+    private static void eventDescriptionErrorMessage() {
+        dashLine();
+        System.out.println("    event what?! Say something. event cannot have a blank description or blank time-frame.");
+        dashLine();
+    }
+    private static void deadlineDescriptionErrorMessage() {
+        dashLine();
+        System.out.println("    deadline what?! Say something. deadline cannot have a blank description or time.");
+        dashLine();
+    }
 
     private static void handleEvent(String line, Task[] taskList) {
-        String eventDescription = line.split("/from ")[0].split("event", 2)[1].trim();
-        String eventFrom = line.split("/from ")[1].split("/to ")[0];
-        String eventTo = line.split("/from ")[1].split("/to ")[1];
-        taskList[Task.taskCount] = new Event(eventDescription, eventFrom, eventTo);
+        try {
+            String eventDescription = line.split("/from ")[0].split("event", 2)[1].trim();
+            String eventFrom = line.split("/from ")[1].split("/to ")[0];
+            String eventTo = line.split("/from ")[1].split("/to ")[1];
+            if(eventDescription.trim().isEmpty()||eventTo.trim().isEmpty()||eventFrom.trim().isEmpty()){
+                throw new emptyCommandParameterException();
+            }
+            taskList[Task.taskCount] = new Event(eventDescription, eventFrom, eventTo);
+            taskAddedMessage(taskList, " event ");
+        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
+            eventDescriptionErrorMessage();
+        }
     }
 
     private static void handleDeadline(String line, Task[] taskList) {
-        String deadlineDescription = line.split("/by ")[0].split("deadline", 2)[1].trim();
-        String deadlineBy = line.split("/by ")[1];
-        taskList[Task.taskCount] = new Deadline(deadlineDescription, deadlineBy);
+        try {
+            String deadlineDescription = line.split("/by ")[0].split("deadline", 2)[1].trim();
+            String deadlineBy = line.split("/by ")[1];
+            if(deadlineDescription.trim().isEmpty()||deadlineBy.trim().isEmpty()){
+                throw new emptyCommandParameterException();
+            }
+            taskList[Task.taskCount] = new Deadline(deadlineDescription, deadlineBy);
+            taskAddedMessage(taskList, " deadline ");
+        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
+            deadlineDescriptionErrorMessage();
+        }
     }
 
-    private static void handleTodo(String line, Task[] taskList) throws invalidTodoCommandException {
-        String todoDescription = line.split(" ",2)[1];
-        if(todoDescription.trim().isEmpty()){
-            throw new invalidTodoCommandException();
+    private static void handleTodo(String line, Task[] taskList) {
+        try {
+            String todoDescription = line.split(" ",2)[1];
+            if(todoDescription.trim().isEmpty()){
+                throw new emptyCommandParameterException();
+            }
+            taskList[Task.taskCount] = new Todo(todoDescription);
+            taskAddedMessage(taskList, " todo ");
+        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
+            todoDescriptionErrorMessage();
         }
-        taskList[Task.taskCount] = new Todo(todoDescription);
     }
 
     private static void handleUnmark(String line, Task[] taskList) {
         try {
             String stringTaskNumber = line.split(" ")[1];
+            if(stringTaskNumber.trim().isEmpty()){
+                throw new emptyCommandParameterException();
+            }
             int taskNumber = Integer.parseInt(stringTaskNumber)-1;
             if(taskNumber>=Task.taskCount||taskNumber<0){
                 outOfBoundsMessage();
@@ -115,7 +142,7 @@ public class Ultron {
                 System.out.println("    " + taskList[taskNumber]);
                 dashLine();
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
             dashLine();
             System.out.println("    This is not a valid command. Type in command unmark x where x is a valid " +
                                 "task number.");
@@ -127,6 +154,9 @@ public class Ultron {
         try {
             String stringTaskNumber = line.split(" ")[1];
             int taskNumber = Integer.parseInt(stringTaskNumber)-1;
+            if(stringTaskNumber.trim().isEmpty()){
+                throw new emptyCommandParameterException();
+            }
             if(taskNumber>=Task.taskCount||taskNumber<0){
                 outOfBoundsMessage();
             }else {
@@ -136,7 +166,7 @@ public class Ultron {
                 System.out.println("    " + taskList[taskNumber]);
                 dashLine();
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException|ArrayIndexOutOfBoundsException|emptyCommandParameterException e) {
             dashLine();
             System.out.println("    This is not a valid command. Type in command mark x where x is a valid " +
                     "task number.");
@@ -169,7 +199,7 @@ public class Ultron {
      */
     public static void outOfBoundsMessage(){
         dashLine();
-        System.out.println("So you think you're funny? You don't even have that many tasks. Out of bounds.");
+        System.out.println("    So you think you're funny? You don't even have that many tasks. Out of bounds.");
         dashLine();
     }
 
