@@ -1,8 +1,10 @@
+package ultron.tasks;
+
 public class Task {
     protected String description;
     protected boolean isDone;
     //a class-level attribute to help quantify total number of created tasks
-    protected static int taskCount = 0;
+    public static int taskCount = 0;
     public Task(){
         this.description="";
         taskCount++;
