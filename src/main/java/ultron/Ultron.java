@@ -59,6 +59,9 @@ public class Ultron {
                 case "event":
                     handleEvent(line, taskList);
                     break;
+                case "delete":
+                    handleDelete(line, taskList);
+                    break;
                 default:
                     throw new unspecifiedCommandException();
                 }
@@ -178,6 +181,32 @@ public class Ultron {
         } catch (NumberFormatException|ArrayIndexOutOfBoundsException|emptyCommandParameterException e) {
             dashLine();
             System.out.println("    This is not a valid command. Type in command mark x where x is a valid " +
+                    "task number.");
+            dashLine();
+        }
+    }
+
+    private static void handleDelete(String line, ArrayList<Task> taskList) {
+        try {
+            String stringTaskNumber = line.split(" ")[1];
+            if(stringTaskNumber.trim().isEmpty()){
+                throw new emptyCommandParameterException();
+            }
+            int taskNumber = Integer.parseInt(stringTaskNumber)-1;
+            if(taskNumber>=Task.taskCount||taskNumber<0){
+                outOfBoundsMessage();
+            }else {
+                Task.taskCount--;
+                dashLine();
+                System.out.println("    Deleted this from your list.");
+                System.out.println("    " + taskList.get(taskNumber));
+                System.out.println("    You now have "+Task.taskCount+(Task.taskCount>1?" tasks.":" task."));
+                dashLine();
+                taskList.remove(taskNumber);
+            }
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
+            dashLine();
+            System.out.println("    This is not a valid command. Type in command unmark x where x is a valid " +
                     "task number.");
             dashLine();
         }
