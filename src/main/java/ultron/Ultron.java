@@ -6,6 +6,7 @@ import ultron.tasks.Event;
 import ultron.tasks.Task;
 import ultron.tasks.Todo;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Ultron {
@@ -27,7 +28,7 @@ public class Ultron {
     public static final int DASH_LINE_WIDTH = 120;
 
     public static void main(String[] args){
-        Task[] taskList = new Task[100];
+        ArrayList<Task> taskList= new ArrayList<>();
         System.out.println(ULTRON_FACE);
         helloMessage();
         Scanner in = new Scanner(System.in);
@@ -92,7 +93,7 @@ public class Ultron {
         dashLine();
     }
 
-    private static void handleEvent(String line, Task[] taskList) {
+    private static void handleEvent(String line, ArrayList<Task> taskList) {
         try {
             String eventDescription = line.split("/from ")[0].split("event", 2)[1].trim();
             String eventFrom = line.split("/from ")[1].split("/to ")[0];
@@ -100,41 +101,41 @@ public class Ultron {
             if(eventDescription.trim().isEmpty()||eventTo.trim().isEmpty()||eventFrom.trim().isEmpty()){
                 throw new emptyCommandParameterException();
             }
-            taskList[Task.taskCount] = new Event(eventDescription, eventFrom, eventTo);
+            taskList.add(Task.taskCount, new Event(eventDescription, eventFrom, eventTo));
             taskAddedMessage(taskList, " event ");
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
             eventDescriptionErrorMessage();
         }
     }
 
-    private static void handleDeadline(String line, Task[] taskList) {
+    private static void handleDeadline(String line, ArrayList<Task> taskList) {
         try {
             String deadlineDescription = line.split("/by ")[0].split("deadline", 2)[1].trim();
             String deadlineBy = line.split("/by ")[1];
             if(deadlineDescription.trim().isEmpty()||deadlineBy.trim().isEmpty()){
                 throw new emptyCommandParameterException();
             }
-            taskList[Task.taskCount] = new Deadline(deadlineDescription, deadlineBy);
+            taskList.add(Task.taskCount, new Deadline(deadlineDescription, deadlineBy));
             taskAddedMessage(taskList, " deadline ");
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
             deadlineDescriptionErrorMessage();
         }
     }
 
-    private static void handleTodo(String line, Task[] taskList) {
+    private static void handleTodo(String line, ArrayList<Task> taskList) {
         try {
             String todoDescription = line.split(" ",2)[1];
             if(todoDescription.trim().isEmpty()){
                 throw new emptyCommandParameterException();
             }
-            taskList[Task.taskCount] = new Todo(todoDescription);
+            taskList.add(Task.taskCount, new Todo(todoDescription));
             taskAddedMessage(taskList, " todo ");
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
             todoDescriptionErrorMessage();
         }
     }
 
-    private static void handleUnmark(String line, Task[] taskList) {
+    private static void handleUnmark(String line, ArrayList<Task> taskList) {
         try {
             String stringTaskNumber = line.split(" ")[1];
             if(stringTaskNumber.trim().isEmpty()){
@@ -144,10 +145,10 @@ public class Ultron {
             if(taskNumber>=Task.taskCount||taskNumber<0){
                 outOfBoundsMessage();
             }else {
-                taskList[taskNumber].setDone(false);
+                taskList.get(taskNumber).setDone(false);
                 dashLine();
                 System.out.println("    Moving backwards? How typical for humans.");
-                System.out.println("    " + taskList[taskNumber]);
+                System.out.println("    " + taskList.get(taskNumber));
                 dashLine();
             }
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
@@ -158,7 +159,7 @@ public class Ultron {
         }
     }
 
-    private static void handleMark(String line, Task[] taskList) {
+    private static void handleMark(String line, ArrayList<Task> taskList) {
         try {
             String stringTaskNumber = line.split(" ")[1];
             int taskNumber = Integer.parseInt(stringTaskNumber)-1;
@@ -168,10 +169,10 @@ public class Ultron {
             if(taskNumber>=Task.taskCount||taskNumber<0){
                 outOfBoundsMessage();
             }else {
-                taskList[taskNumber].setDone(true);
+                taskList.get(taskNumber).setDone(true);
                 dashLine();
                 System.out.println("    I hope you're not expecting a pat on the back. Marked done.");
-                System.out.println("    " + taskList[taskNumber]);
+                System.out.println("    " + taskList.get(taskNumber));
                 dashLine();
             }
         } catch (NumberFormatException|ArrayIndexOutOfBoundsException|emptyCommandParameterException e) {
@@ -182,16 +183,16 @@ public class Ultron {
         }
     }
 
-    private static void printTaskList(Task[] taskList) {
+    private static void printTaskList(ArrayList<Task> taskList) {
         for(int i = 0; i<Task.taskCount;i++){
-            System.out.println("    "+(i+1)+". "+ taskList[i]);
+            System.out.println("    "+(i+1)+". "+ taskList.get(i));
         }
     }
 
-    private static void taskAddedMessage(Task[] taskList, String taskType) {
+    private static void taskAddedMessage(ArrayList<Task> taskList, String taskType) {
         dashLine();
         //taskCount - 1 below to ensure null is not printed
-        System.out.println("    added a" +taskType+ "task: " + taskList[Task.taskCount-1]);
+        System.out.println("    added a" +taskType+ "task: " + taskList.get(Task.taskCount - 1));
         System.out.println("    You now have "+Task.taskCount+(Task.taskCount>1?" tasks.":" task."));
         dashLine();
     }
