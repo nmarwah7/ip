@@ -1,5 +1,6 @@
 
 D | /done 1 /description this /by then
-T | /done 0 /description that
-T | /done 1 /description something more
+T | /done 1 /description that
+T | /done 0 /description something more
 E | /done 0 /description this /from then /to now
+D | /done 0 /description assignmetn /by eow

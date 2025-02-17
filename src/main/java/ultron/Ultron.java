@@ -52,7 +52,7 @@ public class Ultron {
                     handleMark(line, taskList);
                     break;
                 case "unmark":
-                    handleUnmark(line, taskList, taskStorageFile);
+                    handleUnmark(line, taskList);
                     break;
                 case "todo":
                     //error-handling within the handle function
@@ -166,7 +166,7 @@ public class Ultron {
             }
             taskList[Task.taskCount] = new Event(eventDescription, eventFrom, eventTo);
             if (!inStoredTask) {
-                taskAddedMessage(taskList, " todo ");
+                taskAddedMessage(taskList, " event ");
             }
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
             eventDescriptionErrorMessage();
@@ -182,7 +182,7 @@ public class Ultron {
             }
             taskList[Task.taskCount] = new Deadline(deadlineDescription, deadlineBy);
             if (!inStoredTask) {
-                taskAddedMessage(taskList, " todo ");
+                taskAddedMessage(taskList, " deadline ");
             }        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
             deadlineDescriptionErrorMessage();
         }
@@ -228,7 +228,7 @@ public class Ultron {
 
 
 
-    private static void handleUnmark(String line, Task[] taskList, File taskStorageFile) {
+    private static void handleUnmark(String line, Task[] taskList) {
         try {
             String stringTaskNumber = line.split(" ")[1];
             if(stringTaskNumber.trim().isEmpty()){
