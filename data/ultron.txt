@@ -1,3 +1,5 @@
-T | /done 0 /description something like this
-E | /done 0 /description this is import /from then  /to now
-D | /done 0 /description that /by then
+
+D | /done 1 /description this /by then
+T | /done 0 /description that
+T | /done 1 /description something more
+E | /done 0 /description this /from then /to now

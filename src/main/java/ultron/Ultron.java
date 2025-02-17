@@ -56,13 +56,13 @@ public class Ultron {
                     break;
                 case "todo":
                     //error-handling within the handle function
-                    handleTodo(line, taskList, taskStorageFile, false);
+                    handleTodo(line, taskList, false);
                     break;
                 case "deadline":
-                    handleDeadline(line, taskList, taskStorageFile, false);
+                    handleDeadline(line, taskList, false);
                     break;
                 case "event":
-                    handleEvent(line, taskList, taskStorageFile, false);
+                    handleEvent(line, taskList, false);
                     break;
                 default:
                     throw new unspecifiedCommandException();
@@ -73,6 +73,7 @@ public class Ultron {
             line = in.nextLine();
             command = line.split(" ",2)[0];
         }
+        updateStoredTasks(taskStorageFile,taskList);
         byeMessage();
     }
 
@@ -90,15 +91,15 @@ public class Ultron {
                         .split("/description", 2)[0].trim().equals("0")) ;
                 switch (taskType) {
                 case "T":
-                    handleTodo(taskDescription, taskList, taskStorageFile, true);
+                    handleTodo(taskDescription, taskList, true);
                     taskList[Task.taskCount-1].setDone(isDoneTask);
                     break;
                 case "D":
-                    handleDeadline("deadline"+ taskDescription, taskList, taskStorageFile, true);
+                    handleDeadline("deadline"+ taskDescription, taskList, true);
                     taskList[Task.taskCount-1].setDone(isDoneTask);
                     break;
                 case "E":
-                    handleEvent("event"+taskDescription, taskList, taskStorageFile, true);
+                    handleEvent("event"+taskDescription, taskList, true);
                     taskList[Task.taskCount-1].setDone(isDoneTask);
                     break;
                 default:
@@ -155,7 +156,7 @@ public class Ultron {
         dashLine();
     }
 
-    private static void handleEvent(String line, Task[] taskList,File taskStorageFile, boolean alreadyDone) {
+    private static void handleEvent(String line, Task[] taskList, boolean inStoredTask) {
         try {
             String eventDescription = line.split("/from ")[0].split("event", 2)[1].trim();
             String eventFrom = line.split("/from ")[1].split("/to ")[0];
@@ -164,16 +165,7 @@ public class Ultron {
                 throw new emptyCommandParameterException();
             }
             taskList[Task.taskCount] = new Event(eventDescription, eventFrom, eventTo);
-            if (!alreadyDone) {
-                try {
-                    FileWriter writer = new FileWriter(taskStorageFile, true);
-                    writer.write("\n"+"E | /done 0 /description "+eventDescription+" /from "+eventFrom+" /to "+eventTo);
-                    writer.close();
-                } catch (IOException e) {
-                    dashLine();
-                    System.out.println("    Task not successfully saved to data storage.");
-                    dashLine();
-                }
+            if (!inStoredTask) {
                 taskAddedMessage(taskList, " todo ");
             }
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
@@ -181,7 +173,7 @@ public class Ultron {
         }
     }
 
-    private static void handleDeadline(String line, Task[] taskList,File taskStorageFile, boolean alreadyDone) {
+    private static void handleDeadline(String line, Task[] taskList, boolean inStoredTask) {
         try {
             String deadlineDescription = line.split("/by ")[0].split("deadline", 2)[1].trim();
             String deadlineBy = line.split("/by ")[1];
@@ -189,22 +181,14 @@ public class Ultron {
                 throw new emptyCommandParameterException();
             }
             taskList[Task.taskCount] = new Deadline(deadlineDescription, deadlineBy);
-            if (!alreadyDone) {
-                try {
-                    FileWriter writer = new FileWriter(taskStorageFile, true);
-                    writer.write("\n"+"D | /done 0 /description "+deadlineDescription+" /by "+deadlineBy);
-                    writer.close();
-                } catch (IOException e) {
-                    dashLine();
-                    System.out.println("    Task not successfully saved to data storage.");
-                    dashLine();                }
+            if (!inStoredTask) {
                 taskAddedMessage(taskList, " todo ");
             }        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
             deadlineDescriptionErrorMessage();
         }
     }
 
-    private static void handleTodo(String line, Task[] taskList, File taskStorageFile, boolean alreadyDone) {
+    private static void handleTodo(String line, Task[] taskList, boolean inStoredTask) {
         try {
             String todoDescription = line.split(" ",2)[1];
             if(todoDescription.trim().isEmpty()){
@@ -212,15 +196,7 @@ public class Ultron {
             }
             taskList[Task.taskCount] = new Todo(todoDescription);
 
-            if (!alreadyDone) {
-                try {
-                    FileWriter writer = new FileWriter(taskStorageFile, true);
-                    writer.write("T | /done 0 /description "+todoDescription);
-                    writer.close();
-                } catch (IOException e) {
-                    dashLine();
-                    System.out.println("    Task not successfully saved to data storage.");
-                    dashLine();                }
+            if (!inStoredTask) {
                 taskAddedMessage(taskList, " todo ");
             }
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
@@ -228,22 +204,28 @@ public class Ultron {
         }
     }
 
-    private static void reloadTasks(File taskStorageFile, Task[] taskList){
-        for(int i = 0; i<=Task.taskCount;i++){
+    private static void updateStoredTasks(File taskStorageFile, Task[] taskList){
             try {
-                FileWriter writer = new FileWriter(taskStorageFile, true);
-                if(taskList[i] instanceof Deadline) {
-                    writer.write("\n" + "D | /done" + taskList[i].isDone()+" /description " + taskList[i].getDescription() + " /by "
-                            + ((Deadline) taskList[i]).getBy());
+                FileWriter writer = new FileWriter(taskStorageFile);
+                for(int i = 0; i<=Task.taskCount;i++) {
+                    if (taskList[i] instanceof Deadline) {
+                        writer.write("\n" + "D | /done " + (taskList[i].isDone()?"1":"0") + " /description " + taskList[i].getDescription() + " /by "
+                                + ((Deadline) taskList[i]).getBy().trim());
+                    }
+                    else if (taskList[i] instanceof Todo) {
+                        writer.write("\n" + "T | /done " + (taskList[i].isDone()?"1":"0") + " /description " + taskList[i].getDescription());
+                    }else if (taskList[i] instanceof Event) {
+                        writer.write("\n" + "E | /done " + (taskList[i].isDone()?"1":"0") + " /description " + taskList[i].getDescription()
+                                +" /from "+((Event) taskList[i]).getFrom().trim()+ " /to "+((Event) taskList[i]).getTo().trim());
+                    }
                 }
                 writer.close();
             } catch (IOException e) {
                 dashLine();
                 System.out.println("    Task not successfully saved to data storage.");
                 dashLine();                }
-            taskAddedMessage(taskList, " todo ");
         }
-    }
+
 
 
     private static void handleUnmark(String line, Task[] taskList, File taskStorageFile) {
@@ -257,33 +239,6 @@ public class Ultron {
                 outOfBoundsMessage();
             }else {
                 taskList[taskNumber].setDone(false);
-//                try{
-//                Scanner s = new Scanner(taskStorageFile);
-//                do {
-//                    String storedTask = s.nextLine();
-//                    if(storedTask.trim().isEmpty()){
-//                        continue;
-//                    }
-//                    int storedTaskNumber = Integer.parseInt(storedTask.split("\\|",2)[1].split(" ",2)[0]);
-//                    if(storedTaskNumber-1 == taskNumber){
-//                        try {
-//                            FileWriter writer = new FileWriter(taskStorageFile, true); // 'true' appends to file
-//                            writer.write(storedTask.replace("/done 1", "/done 0") + System.lineSeparator());
-//                            writer.close();
-//                            break;
-//                        } catch (IOException e) {
-//                            dashLine();
-//                            System.out.println("    Your data cannot be written to file.");
-//                            dashLine();
-//                        }
-//                    }
-//                }while(s.hasNext());
-//                s.close();
-//            } catch (FileNotFoundException|ArrayIndexOutOfBoundsException e) {
-//                dashLine();
-//                System.out.println("    Your data cannot be loaded. Some error in your file formatting.");
-//                dashLine();
-            //}
                 dashLine();
                 System.out.println("    Moving backwards? How typical for humans.");
                 System.out.println("    " + taskList[taskNumber]);
