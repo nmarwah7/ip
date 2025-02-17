@@ -31,58 +31,9 @@ public class Ultron {
     public static final int DASH_LINE_WIDTH = 120;
 
     public static void main(String[] args){
-        String directoryPath = "data";
-        String filePath = directoryPath + "/ultron.txt";
-        File directory = new File(directoryPath);
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
-        File taskStorageFile = new File(filePath);
-
-        try {
-            taskStorageFile.createNewFile();
-
-        } catch (IOException e) {
-            dashLine();
-            System.out.println("    Your data cannot be saved. Storage file not created.");
-            dashLine();
-        }
-
+        File taskStorageFile = getTaskStorageFile();
         Task[] taskList = new Task[100];
-        try {
-            Scanner s = new Scanner(taskStorageFile);
-            do {
-                String line = s.nextLine();
-                if(line.trim().isEmpty()){
-                    continue;
-                }
-                String taskType = line.split("|",2)[0];
-                String taskDescription = line.split("/description",2)[1];
-                Boolean isDoneTask = (!line.split("/done")[1]
-                        .split("/description", 2)[0].trim().equals("0")) ;
-                switch (taskType) {
-                case "T":
-                    handleTodo(taskDescription, taskList, taskStorageFile, true);
-                    taskList[Task.taskCount-1].setDone(isDoneTask);
-                    break;
-                case "D":
-                    handleDeadline("deadline"+ taskDescription, taskList, taskStorageFile, true);
-                    taskList[Task.taskCount-1].setDone(isDoneTask);
-                    break;
-                case "E":
-                    handleEvent("event"+taskDescription,taskList, taskStorageFile, true);
-                    taskList[Task.taskCount-1].setDone(isDoneTask);
-                    break;
-                default:
-                    break;
-                }
-            }while(s.hasNext());
-            s.close();
-        } catch (FileNotFoundException|ArrayIndexOutOfBoundsException e) {
-            dashLine();
-            System.out.println("    Your data cannot be loaded. Some error in your file formatting.");
-            dashLine();
-        }
+        loadPreviousTaskData(taskStorageFile, taskList);
         System.out.println(ULTRON_FACE);
         helloMessage();
         Scanner in = new Scanner(System.in);
@@ -123,6 +74,63 @@ public class Ultron {
             command = line.split(" ",2)[0];
         }
         byeMessage();
+    }
+
+    private static void loadPreviousTaskData(File taskStorageFile, Task[] taskList) {
+        try {
+            Scanner s = new Scanner(taskStorageFile);
+            while(s.hasNext()){
+                String line = s.nextLine();
+                if(line.trim().isEmpty()){
+                    continue;
+                }
+                String taskType = line.split("|",2)[0];
+                String taskDescription = line.split("/description",2)[1];
+                Boolean isDoneTask = (!line.split("/done")[1]
+                        .split("/description", 2)[0].trim().equals("0")) ;
+                switch (taskType) {
+                case "T":
+                    handleTodo(taskDescription, taskList, taskStorageFile, true);
+                    taskList[Task.taskCount-1].setDone(isDoneTask);
+                    break;
+                case "D":
+                    handleDeadline("deadline"+ taskDescription, taskList, taskStorageFile, true);
+                    taskList[Task.taskCount-1].setDone(isDoneTask);
+                    break;
+                case "E":
+                    handleEvent("event"+taskDescription, taskList, taskStorageFile, true);
+                    taskList[Task.taskCount-1].setDone(isDoneTask);
+                    break;
+                default:
+                    break;
+                }
+            }
+            s.close();
+        } catch (FileNotFoundException|ArrayIndexOutOfBoundsException e) {
+            dashLine();
+            System.out.println("    Your data cannot be loaded. Some error in your file formatting.");
+            dashLine();
+        }
+    }
+
+    private static File getTaskStorageFile() {
+        String directoryPath = "data";
+        String filePath = directoryPath + "/ultron.txt";
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+        File taskStorageFile = new File(filePath);
+
+        try {
+            taskStorageFile.createNewFile();
+
+        } catch (IOException e) {
+            dashLine();
+            System.out.println("    Your data cannot be saved. Storage file not created.");
+            dashLine();
+        }
+        return taskStorageFile;
     }
 
     private static void unspecifiedCommandErrorMessage() {
