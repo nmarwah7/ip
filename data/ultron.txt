@@ -1,0 +1,5 @@
+T |1 /done 1 /description read book
+D |2 /done 0 /description return book /by June 6th
+E |3 /done 0 /description project meeting /from Aug 6th /to 2-4pm
+T |4 /done 1 /description join sports club
+T |5 /done 1 /description this

@@ -6,7 +6,11 @@ import ultron.tasks.Event;
 import ultron.tasks.Task;
 import ultron.tasks.Todo;
 
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.util.Scanner;
+import java.io.File;
+import java.io.IOException;
 
 public class Ultron {
     //the below face ASCII art was obtained through help of ChatGPT who was provided the prompt: "give me
@@ -27,7 +31,58 @@ public class Ultron {
     public static final int DASH_LINE_WIDTH = 120;
 
     public static void main(String[] args){
+        String directoryPath = "data";
+        String filePath = directoryPath + "/ultron.txt";
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+        File taskStorageFile = new File(filePath);
+
+        try {
+            taskStorageFile.createNewFile();
+
+        } catch (IOException e) {
+            dashLine();
+            System.out.println("    Your data cannot be saved. Storage file not created.");
+            dashLine();
+        }
+
         Task[] taskList = new Task[100];
+        try {
+            Scanner s = new Scanner(taskStorageFile);
+            do {
+                String line = s.nextLine();
+                if(line.trim().isEmpty()){
+                    continue;
+                }
+                String taskType = line.split("|",2)[0];
+                String taskDescription = line.split("/description",2)[1];
+                Boolean isDoneTask = (!line.split("/done")[1]
+                        .split("/description", 2)[0].trim().equals("0")) ;
+                switch (taskType) {
+                case "T":
+                    handleTodo(taskDescription, taskList, taskStorageFile, true);
+                    taskList[Task.taskCount-1].setDone(isDoneTask);
+                    break;
+                case "D":
+                    handleDeadline("deadline"+ taskDescription, taskList, taskStorageFile, true);
+                    taskList[Task.taskCount-1].setDone(isDoneTask);
+                    break;
+                case "E":
+                    handleEvent("event"+taskDescription,taskList, taskStorageFile, true);
+                    taskList[Task.taskCount-1].setDone(isDoneTask);
+                    break;
+                default:
+                    break;
+                }
+            }while(s.hasNext());
+            s.close();
+        } catch (FileNotFoundException|ArrayIndexOutOfBoundsException e) {
+            dashLine();
+            System.out.println("    Your data cannot be loaded. Some error in your file formatting.");
+            dashLine();
+        }
         System.out.println(ULTRON_FACE);
         helloMessage();
         Scanner in = new Scanner(System.in);
@@ -46,17 +101,17 @@ public class Ultron {
                     handleMark(line, taskList);
                     break;
                 case "unmark":
-                    handleUnmark(line, taskList);
+                    handleUnmark(line, taskList, taskStorageFile);
                     break;
                 case "todo":
                     //error-handling within the handle function
-                    handleTodo(line, taskList);
+                    handleTodo(line, taskList, taskStorageFile, false);
                     break;
                 case "deadline":
-                    handleDeadline(line, taskList);
+                    handleDeadline(line, taskList, taskStorageFile, false);
                     break;
                 case "event":
-                    handleEvent(line, taskList);
+                    handleEvent(line, taskList, taskStorageFile, false);
                     break;
                 default:
                     throw new unspecifiedCommandException();
@@ -92,7 +147,7 @@ public class Ultron {
         dashLine();
     }
 
-    private static void handleEvent(String line, Task[] taskList) {
+    private static void handleEvent(String line, Task[] taskList,File taskStorageFile, boolean alreadyDone) {
         try {
             String eventDescription = line.split("/from ")[0].split("event", 2)[1].trim();
             String eventFrom = line.split("/from ")[1].split("/to ")[0];
@@ -101,13 +156,24 @@ public class Ultron {
                 throw new emptyCommandParameterException();
             }
             taskList[Task.taskCount] = new Event(eventDescription, eventFrom, eventTo);
-            taskAddedMessage(taskList, " event ");
+            if (!alreadyDone) {
+                try {
+                    FileWriter writer = new FileWriter(taskStorageFile, true);
+                    writer.write("\n"+"E | /done 0 /description "+eventDescription+" /from "+eventFrom+" /to "+eventTo);
+                    writer.close();
+                } catch (IOException e) {
+                    dashLine();
+                    System.out.println("    Task not successfully saved to data storage.");
+                    dashLine();
+                }
+                taskAddedMessage(taskList, " todo ");
+            }
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
             eventDescriptionErrorMessage();
         }
     }
 
-    private static void handleDeadline(String line, Task[] taskList) {
+    private static void handleDeadline(String line, Task[] taskList,File taskStorageFile, boolean alreadyDone) {
         try {
             String deadlineDescription = line.split("/by ")[0].split("deadline", 2)[1].trim();
             String deadlineBy = line.split("/by ")[1];
@@ -115,26 +181,64 @@ public class Ultron {
                 throw new emptyCommandParameterException();
             }
             taskList[Task.taskCount] = new Deadline(deadlineDescription, deadlineBy);
-            taskAddedMessage(taskList, " deadline ");
-        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
+            if (!alreadyDone) {
+                try {
+                    FileWriter writer = new FileWriter(taskStorageFile, true);
+                    writer.write("\n"+"D | /done 0 /description "+deadlineDescription+" /by "+deadlineBy);
+                    writer.close();
+                } catch (IOException e) {
+                    dashLine();
+                    System.out.println("    Task not successfully saved to data storage.");
+                    dashLine();                }
+                taskAddedMessage(taskList, " todo ");
+            }        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
             deadlineDescriptionErrorMessage();
         }
     }
 
-    private static void handleTodo(String line, Task[] taskList) {
+    private static void handleTodo(String line, Task[] taskList, File taskStorageFile, boolean alreadyDone) {
         try {
             String todoDescription = line.split(" ",2)[1];
             if(todoDescription.trim().isEmpty()){
                 throw new emptyCommandParameterException();
             }
             taskList[Task.taskCount] = new Todo(todoDescription);
-            taskAddedMessage(taskList, " todo ");
+
+            if (!alreadyDone) {
+                try {
+                    FileWriter writer = new FileWriter(taskStorageFile, true);
+                    writer.write("T | /done 0 /description "+todoDescription);
+                    writer.close();
+                } catch (IOException e) {
+                    dashLine();
+                    System.out.println("    Task not successfully saved to data storage.");
+                    dashLine();                }
+                taskAddedMessage(taskList, " todo ");
+            }
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
             todoDescriptionErrorMessage();
         }
     }
 
-    private static void handleUnmark(String line, Task[] taskList) {
+    private static void reloadTasks(File taskStorageFile, Task[] taskList){
+        for(int i = 0; i<=Task.taskCount;i++){
+            try {
+                FileWriter writer = new FileWriter(taskStorageFile, true);
+                if(taskList[i] instanceof Deadline) {
+                    writer.write("\n" + "D | /done" + taskList[i].isDone()+" /description " + taskList[i].getDescription() + " /by "
+                            + ((Deadline) taskList[i]).getBy());
+                }
+                writer.close();
+            } catch (IOException e) {
+                dashLine();
+                System.out.println("    Task not successfully saved to data storage.");
+                dashLine();                }
+            taskAddedMessage(taskList, " todo ");
+        }
+    }
+
+
+    private static void handleUnmark(String line, Task[] taskList, File taskStorageFile) {
         try {
             String stringTaskNumber = line.split(" ")[1];
             if(stringTaskNumber.trim().isEmpty()){
@@ -145,6 +249,33 @@ public class Ultron {
                 outOfBoundsMessage();
             }else {
                 taskList[taskNumber].setDone(false);
+//                try{
+//                Scanner s = new Scanner(taskStorageFile);
+//                do {
+//                    String storedTask = s.nextLine();
+//                    if(storedTask.trim().isEmpty()){
+//                        continue;
+//                    }
+//                    int storedTaskNumber = Integer.parseInt(storedTask.split("\\|",2)[1].split(" ",2)[0]);
+//                    if(storedTaskNumber-1 == taskNumber){
+//                        try {
+//                            FileWriter writer = new FileWriter(taskStorageFile, true); // 'true' appends to file
+//                            writer.write(storedTask.replace("/done 1", "/done 0") + System.lineSeparator());
+//                            writer.close();
+//                            break;
+//                        } catch (IOException e) {
+//                            dashLine();
+//                            System.out.println("    Your data cannot be written to file.");
+//                            dashLine();
+//                        }
+//                    }
+//                }while(s.hasNext());
+//                s.close();
+//            } catch (FileNotFoundException|ArrayIndexOutOfBoundsException e) {
+//                dashLine();
+//                System.out.println("    Your data cannot be loaded. Some error in your file formatting.");
+//                dashLine();
+            //}
                 dashLine();
                 System.out.println("    Moving backwards? How typical for humans.");
                 System.out.println("    " + taskList[taskNumber]);
@@ -169,6 +300,7 @@ public class Ultron {
                 outOfBoundsMessage();
             }else {
                 taskList[taskNumber].setDone(true);
+
                 dashLine();
                 System.out.println("    I hope you're not expecting a pat on the back. Marked done.");
                 System.out.println("    " + taskList[taskNumber]);
