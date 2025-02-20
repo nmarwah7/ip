@@ -1,4 +1,4 @@
 
 T | /done 1 /description something
-E | /done 1 /description something big /from then /to now
+E | /done 0 /description something big /from then /to now
 D | /done 0 /description assignment /by eow
