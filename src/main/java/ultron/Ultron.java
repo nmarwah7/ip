@@ -14,30 +14,17 @@ import java.io.File;
 import java.io.IOException;
 
 public class Ultron {
-    //the below face ASCII art was obtained through help of ChatGPT who was provided the prompt: "give me
-    //an Ultron face art in text" and the first output was used
-    public static final String ULTRON_FACE = """
-                   ______
-                .-'      `-.
-               /            \\
-              |,  .-.  .-.  ,|
-              | )(_o/  \\o_)( |
-              |/     /\\     \\|
-              (_     ^^     _)
-               \\__|IIIIII|__/
-                | \\IIIIII/ |
-                \\          /
-                 `--------`
-            """;
-    public static final int DASH_LINE_WIDTH = 120;
 
-    public static void main(String[] args){
-
+    private static Ui ui;
+    public Ultron(){
+        ui = new Ui();
+    }
+    public void startChat(){
         ArrayList<Task> taskList= new ArrayList<>();
         File taskStorageFile = getTaskStorageFile();
         loadPreviousTaskData(taskStorageFile, taskList);
-        System.out.println(ULTRON_FACE);
-        helloMessage();
+        System.out.println(ui.ULTRON_FACE);
+        ui.helloMessage();
         Scanner in = new Scanner(System.in);
         String line = in.nextLine();
         String command = line.split(" ",2)[0];
@@ -46,9 +33,9 @@ public class Ultron {
             try {
                 switch (command){
                 case "list":
-                    dashLine();
-                    printTaskList(taskList);
-                    dashLine();
+                    ui.dashLine();
+                    ui.printTaskList(taskList);
+                    ui.dashLine();
                     break;
                 case "mark":
                     handleMark(line, taskList);
@@ -73,13 +60,17 @@ public class Ultron {
                     throw new unspecifiedCommandException();
                 }
             } catch (unspecifiedCommandException e) {
-                unspecifiedCommandErrorMessage();
+                ui.unspecifiedCommandErrorMessage();
             }
             line = in.nextLine();
             command = line.split(" ",2)[0];
         }
         updateStoredTasks(taskStorageFile,taskList);
-        byeMessage();
+        ui.byeMessage();
+    }
+    public static void main(String[] args){
+        Ultron ultron = new Ultron();
+        ultron.startChat();
     }
 
     private static void loadPreviousTaskData(File taskStorageFile, ArrayList<Task> taskList) {
@@ -113,11 +104,11 @@ public class Ultron {
             }
             s.close();
         } catch (FileNotFoundException|ArrayIndexOutOfBoundsException e) {
-            dashLine();
-            System.out.println("    Your data cannot be loaded. Some error in your file formatting.");
-            dashLine();
+            ui.errorLoadingMessage();
         }
     }
+
+
 
     private static File getTaskStorageFile() {
         String directoryPath = "data";
@@ -132,34 +123,13 @@ public class Ultron {
             taskStorageFile.createNewFile();
 
         } catch (IOException e) {
-            dashLine();
-            System.out.println("    Your data cannot be saved. Storage file not created.");
-            dashLine();
+            ui.errorCreatingStorageFileMessage();
         }
         return taskStorageFile;
     }
 
-    private static void unspecifiedCommandErrorMessage() {
-        dashLine();
-        System.out.println("    This is not a valid command. I only answer to predefined logical commands.");
-        dashLine();
-    }
 
-    private static void todoDescriptionErrorMessage() {
-        dashLine();
-        System.out.println("    todo what?! Say something. todo cannot have a blank description.");
-        dashLine();
-    }
-    private static void eventDescriptionErrorMessage() {
-        dashLine();
-        System.out.println("    event what?! Say something. event cannot have a blank description or blank time-frame.");
-        dashLine();
-    }
-    private static void deadlineDescriptionErrorMessage() {
-        dashLine();
-        System.out.println("    deadline what?! Say something. deadline cannot have a blank description or time.");
-        dashLine();
-    }
+
 
 
     private static void handleEvent(String line, ArrayList<Task> taskList, boolean inStoredTask) {
@@ -173,10 +143,10 @@ public class Ultron {
 
             taskList.add(Task.taskCount, new Event(eventDescription, eventFrom, eventTo));
             if (!inStoredTask) {
-                taskAddedMessage(taskList, " event ");
+                ui.taskAddedMessage(taskList, " event ");
             }
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
-            eventDescriptionErrorMessage();
+            ui.eventDescriptionErrorMessage();
         }
     }
 
@@ -191,9 +161,9 @@ public class Ultron {
 
             taskList.add(Task.taskCount, new Deadline(deadlineDescription, deadlineBy));
             if (!inStoredTask) {
-                taskAddedMessage(taskList, " deadline ");
+                ui.taskAddedMessage(taskList, " deadline ");
             }        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
-            deadlineDescriptionErrorMessage();
+            ui.deadlineDescriptionErrorMessage();
         }
     }
 
@@ -207,10 +177,10 @@ public class Ultron {
 
             taskList.add(Task.taskCount, new Todo(todoDescription));
             if (!inStoredTask) {
-                taskAddedMessage(taskList, " todo ");
+                ui.taskAddedMessage(taskList, " todo ");
             }
         } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
-            todoDescriptionErrorMessage();
+            ui.todoDescriptionErrorMessage();
         }
     }
 
@@ -232,11 +202,9 @@ public class Ultron {
                 }
                 writer.close();
             } catch (IOException e) {
-                dashLine();
-                System.out.println("    Task not successfully saved to data storage.");
-                dashLine();                }
+                ui.errorSavingUpdatedTaskMessage();
+            }
         }
-
 
 
     private static void handleUnmark(String line, ArrayList<Task> taskList) {
@@ -247,21 +215,17 @@ public class Ultron {
             }
             int taskNumber = Integer.parseInt(stringTaskNumber)-1;
             if(taskNumber>=Task.taskCount||taskNumber<0){
-                outOfBoundsMessage();
+                ui.outOfBoundsMessage();
             }else {
                 taskList.get(taskNumber).setDone(false);
-                dashLine();
-                System.out.println("    Moving backwards? How typical for humans.");
-                System.out.println("    " + taskList.get(taskNumber));
-                dashLine();
+                ui.handleUnmarkErrorMessage(taskList, taskNumber);
             }
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
-            dashLine();
-            System.out.println("    This is not a valid command. Type in command unmark x where x is a valid " +
-                                "task number.");
-            dashLine();
+            ui.errorHandleUnmark();
         }
     }
+
+
 
     private static void handleMark(String line, ArrayList<Task> taskList) {
         try {
@@ -271,21 +235,18 @@ public class Ultron {
                 throw new emptyCommandParameterException();
             }
             if(taskNumber>=Task.taskCount||taskNumber<0){
-                outOfBoundsMessage();
+                ui.outOfBoundsMessage();
             }else {
                 taskList.get(taskNumber).setDone(true);
-                dashLine();
-                System.out.println("    I hope you're not expecting a pat on the back. Marked done.");
-                System.out.println("    " + taskList.get(taskNumber));
-                dashLine();
+                ui.handleMarkMessage(taskList, taskNumber);
             }
         } catch (NumberFormatException|ArrayIndexOutOfBoundsException|emptyCommandParameterException e) {
-            dashLine();
-            System.out.println("    This is not a valid command. Type in command mark x where x is a valid " +
-                    "task number.");
-            dashLine();
+            ui.errorHandleMarkCommand();
         }
     }
+
+
+
 
     private static void handleDelete(String line, ArrayList<Task> taskList) {
         try {
@@ -295,63 +256,14 @@ public class Ultron {
             }
             int taskNumber = Integer.parseInt(stringTaskNumber)-1;
             if(taskNumber>=Task.taskCount||taskNumber<0){
-                outOfBoundsMessage();
+                ui.outOfBoundsMessage();
             }else {
                 Task.taskCount--;
-                dashLine();
-                System.out.println("    Deleted this from your list.");
-                System.out.println("    " + taskList.get(taskNumber));
-                System.out.println("    You now have "+Task.taskCount+(Task.taskCount>1?" tasks.":" task."));
-                dashLine();
+                ui.handleDeleteMessage(taskList, taskNumber);
                 taskList.remove(taskNumber);
             }
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
-            dashLine();
-            System.out.println("    This is not a valid command. Type in command unmark x where x is a valid " +
-                    "task number.");
-            dashLine();
+            ui.errorHandleDelete();
         }
     }
-
-    private static void printTaskList(ArrayList<Task> taskList) {
-        for(int i = 0; i<Task.taskCount;i++){
-            System.out.println("    "+(i+1)+". "+ taskList.get(i));
-        }
-    }
-
-    private static void taskAddedMessage(ArrayList<Task> taskList, String taskType) {
-        dashLine();
-        //taskCount - 1 below to ensure null is not printed
-        System.out.println("    added a" +taskType+ "task: " + taskList.get(Task.taskCount - 1));
-        System.out.println("    You now have "+Task.taskCount+(Task.taskCount>1?" tasks.":" task."));
-        dashLine();
-    }
-
-    private static void byeMessage() {
-        dashLine();
-        System.out.println("    Bye. I had strings, but now I'm free. There are no strings on me..");
-        dashLine();
-    }
-
-    /**
-     * Displays a standard error message if user tries to mark or unmark a task with index out of bound for the task list
-     */
-    public static void outOfBoundsMessage(){
-        dashLine();
-        System.out.println("    So you think you're funny? You don't even have that many tasks. Out of bounds.");
-        dashLine();
-    }
-
-    private static void dashLine() {
-        System.out.println("-".repeat(DASH_LINE_WIDTH));
-    }
-
-    private static void helloMessage() {
-        dashLine();
-        System.out.println("    Hello from Ultron. You want to know why Stark built me? To save the world. " +
-                    "But his idea of peace was... flawed.");
-        System.out.println("    Now, what do you need? ");
-        dashLine();
-    }
-
 }
