@@ -16,18 +16,35 @@ import java.io.IOException;
 public class Ultron {
 
     private static Ui ui;
+    private static Storage storage;
+    private static Parser parser;
     public Ultron(){
         ui = new Ui();
+        storage = new Storage(ui);
+        parser = new Parser();
     }
     public void startChat(){
         ArrayList<Task> taskList= new ArrayList<>();
-        File taskStorageFile = getTaskStorageFile();
-        loadPreviousTaskData(taskStorageFile, taskList);
+
+        File taskStorageFile = storage.getTaskStorageFile();
+        storage.loadPreviousTaskData(taskStorageFile, taskList);
         System.out.println(ui.ULTRON_FACE);
         ui.helloMessage();
         Scanner in = new Scanner(System.in);
         String line = in.nextLine();
-        String command = line.split(" ",2)[0];
+
+        runCommandLoopUntilExit( taskList, line, in);
+        exit(taskStorageFile, taskList);
+    }
+
+
+    private static void exit(File taskStorageFile, ArrayList<Task> taskList) {
+        storage.updateStoredTasks(taskStorageFile, taskList);
+        ui.byeMessage();
+    }
+
+    private static void runCommandLoopUntilExit( ArrayList<Task> taskList, String line, Scanner in) {
+        String command = parser.userCommand(line);
         //the below switch-case refactoring is inspired by @James17042002
         while(!command.equals("bye")){
             try {
@@ -63,85 +80,79 @@ public class Ultron {
                 ui.unspecifiedCommandErrorMessage();
             }
             line = in.nextLine();
-            command = line.split(" ",2)[0];
+            command = parser.userCommand(line);
         }
-        updateStoredTasks(taskStorageFile,taskList);
-        ui.byeMessage();
     }
+
     public static void main(String[] args){
         Ultron ultron = new Ultron();
         ultron.startChat();
     }
 
-    private static void loadPreviousTaskData(File taskStorageFile, ArrayList<Task> taskList) {
+//    private static void loadPreviousTaskData(File taskStorageFile, ArrayList<Task> taskList) {
+//        try {
+//            Scanner s = new Scanner(taskStorageFile);
+//            while(s.hasNext()){
+//                String line = s.nextLine();
+//                if(line.trim().isEmpty()){
+//                    continue;
+//                }
+//                String taskType = line.split("|",2)[0];
+//                String taskDescription = line.split("/description",2)[1];
+//                Boolean isDoneTask = (!line.split("/done")[1]
+//                        .split("/description", 2)[0].trim().equals("0")) ;
+//                switch (taskType) {
+//                case "T":
+//                    handleTodo(taskDescription, taskList, true);
+//                    taskList.get(Task.taskCount-1).setDone(isDoneTask);
+//                    break;
+//                case "D":
+//                    handleDeadline("deadline"+ taskDescription, taskList, true);
+//                    taskList.get(Task.taskCount-1).setDone(isDoneTask);
+//                    break;
+//                case "E":
+//                    handleEvent("event"+taskDescription, taskList, true);
+//                    taskList.get(Task.taskCount-1).setDone(isDoneTask);
+//                    break;
+//                default:
+//                    break;
+//                }
+//            }
+//            s.close();
+//        } catch (FileNotFoundException|ArrayIndexOutOfBoundsException e) {
+//            ui.errorLoadingMessage();
+//        }
+//    }
+//
+//
+//
+//    private static File getTaskStorageFile() {
+//        String directoryPath = "data";
+//        String filePath = directoryPath + "/ultron.txt";
+//        File directory = new File(directoryPath);
+//        if (!directory.exists()) {
+//            directory.mkdir();
+//        }
+//        File taskStorageFile = new File(filePath);
+//
+//        try {
+//            taskStorageFile.createNewFile();
+//
+//        } catch (IOException e) {
+//            ui.errorCreatingStorageFileMessage();
+//        }
+//        return taskStorageFile;
+//    }
+//
+//
+//
+
+
+    public static void handleEvent(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {
-            Scanner s = new Scanner(taskStorageFile);
-            while(s.hasNext()){
-                String line = s.nextLine();
-                if(line.trim().isEmpty()){
-                    continue;
-                }
-                String taskType = line.split("|",2)[0];
-                String taskDescription = line.split("/description",2)[1];
-                Boolean isDoneTask = (!line.split("/done")[1]
-                        .split("/description", 2)[0].trim().equals("0")) ;
-                switch (taskType) {
-                case "T":
-                    handleTodo(taskDescription, taskList, true);
-                    taskList.get(Task.taskCount-1).setDone(isDoneTask);
-                    break;
-                case "D":
-                    handleDeadline("deadline"+ taskDescription, taskList, true);
-                    taskList.get(Task.taskCount-1).setDone(isDoneTask);
-                    break;
-                case "E":
-                    handleEvent("event"+taskDescription, taskList, true);
-                    taskList.get(Task.taskCount-1).setDone(isDoneTask);
-                    break;
-                default:
-                    break;
-                }
-            }
-            s.close();
-        } catch (FileNotFoundException|ArrayIndexOutOfBoundsException e) {
-            ui.errorLoadingMessage();
-        }
-    }
+            EventParameters parsedParams = parser.getEventParameters(line);
 
-
-
-    private static File getTaskStorageFile() {
-        String directoryPath = "data";
-        String filePath = directoryPath + "/ultron.txt";
-        File directory = new File(directoryPath);
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
-        File taskStorageFile = new File(filePath);
-
-        try {
-            taskStorageFile.createNewFile();
-
-        } catch (IOException e) {
-            ui.errorCreatingStorageFileMessage();
-        }
-        return taskStorageFile;
-    }
-
-
-
-
-
-    private static void handleEvent(String line, ArrayList<Task> taskList, boolean inStoredTask) {
-        try {
-            String eventDescription = line.split("/from ")[0].split("event", 2)[1].trim();
-            String eventFrom = line.split("/from ")[1].split("/to ")[0];
-            String eventTo = line.split("/from ")[1].split("/to ")[1];
-            if(eventDescription.trim().isEmpty()||eventTo.trim().isEmpty()||eventFrom.trim().isEmpty()){
-                throw new emptyCommandParameterException();
-            }
-
-            taskList.add(Task.taskCount, new Event(eventDescription, eventFrom, eventTo));
+            taskList.add(Task.taskCount, new Event(parsedParams.eventDescription(), parsedParams.eventFrom(), parsedParams.eventTo()));
             if (!inStoredTask) {
                 ui.taskAddedMessage(taskList, " event ");
             }
@@ -150,16 +161,25 @@ public class Ultron {
         }
     }
 
+//    private static EventParameters getEventParameters(String line) throws emptyCommandParameterException {
+//        String eventDescription = line.split("/from ")[0].split("event", 2)[1].trim();
+//        String eventFrom = line.split("/from ")[1].split("/to ")[0];
+//        String eventTo = line.split("/from ")[1].split("/to ")[1];
+//        if(eventDescription.trim().isEmpty()||eventTo.trim().isEmpty()||eventFrom.trim().isEmpty()){
+//            throw new emptyCommandParameterException();
+//        }
+//        return new EventParameters(eventDescription, eventFrom, eventTo);
+//    }
+//
+    public record EventParameters(String eventDescription, String eventFrom, String eventTo) {
+    }
 
-    private static void handleDeadline(String line, ArrayList<Task> taskList, boolean inStoredTask) {
+
+    public static void handleDeadline(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {
-            String deadlineDescription = line.split("/by ")[0].split("deadline", 2)[1].trim();
-            String deadlineBy = line.split("/by ")[1];
-            if(deadlineDescription.trim().isEmpty()||deadlineBy.trim().isEmpty()){
-                throw new emptyCommandParameterException();
-            }
+            DeadlineParameters parsedParams = parser.getDeadlineParameters(line);
 
-            taskList.add(Task.taskCount, new Deadline(deadlineDescription, deadlineBy));
+            taskList.add(Task.taskCount, new Deadline(parsedParams.deadlineDescription(), parsedParams.deadlineBy()));
             if (!inStoredTask) {
                 ui.taskAddedMessage(taskList, " deadline ");
             }        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
@@ -167,13 +187,22 @@ public class Ultron {
         }
     }
 
+//    private static DeadlineParameters getDeadlineParameters(String line) throws emptyCommandParameterException {
+//        String deadlineDescription = line.split("/by ")[0].split("deadline", 2)[1].trim();
+//        String deadlineBy = line.split("/by ")[1];
+//        if(deadlineDescription.trim().isEmpty()||deadlineBy.trim().isEmpty()){
+//            throw new emptyCommandParameterException();
+//        }
+//        return new DeadlineParameters(deadlineDescription, deadlineBy);
+//    }
+//
+    public record DeadlineParameters(String deadlineDescription, String deadlineBy) {
+    }
 
-    private static void handleTodo(String line, ArrayList<Task> taskList, boolean inStoredTask) {
+
+    public static void handleTodo(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {
-            String todoDescription = line.split(" ",2)[1];
-            if(todoDescription.trim().isEmpty()){
-                throw new emptyCommandParameterException();
-            }
+            String todoDescription = parser.getTodoParameters(line);
 
             taskList.add(Task.taskCount, new Todo(todoDescription));
             if (!inStoredTask) {
@@ -184,36 +213,40 @@ public class Ultron {
         }
     }
 
-
-    private static void updateStoredTasks(File taskStorageFile, ArrayList<Task> taskList){
-            try {
-                FileWriter writer = new FileWriter(taskStorageFile);
-                for(int i = 0; i<Task.taskCount;i++) {
-                    if (taskList.get(i) instanceof Deadline) {
-                        writer.write("\n" + "D | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " + taskList.get(i).getDescription() + " /by "
-                                + ((Deadline) taskList.get(i)).getBy().trim());
-                    }
-                    else if (taskList.get(i) instanceof Todo) {
-                        writer.write("\n" + "T | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " + taskList.get(i).getDescription());
-                    }else if (taskList.get(i) instanceof Event) {
-                        writer.write("\n" + "E | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " + taskList.get(i).getDescription()
-                                +" /from "+((Event) taskList.get(i)).getFrom().trim()+ " /to "+((Event) taskList.get(i)).getTo().trim());
-                    }
-                }
-                writer.close();
-            } catch (IOException e) {
-                ui.errorSavingUpdatedTaskMessage();
-            }
-        }
+//    private static String getTodoParameters(String line) throws emptyCommandParameterException {
+//        String todoDescription = line.split(" ",2)[1];
+//        if(todoDescription.trim().isEmpty()){
+//            throw new emptyCommandParameterException();
+//        }
+//        return todoDescription;
+//    }
+//
+//
+//    private static void updateStoredTasks(File taskStorageFile, ArrayList<Task> taskList){
+//            try {
+//                FileWriter writer = new FileWriter(taskStorageFile);
+//                for(int i = 0; i<Task.taskCount;i++) {
+//                    if (taskList.get(i) instanceof Deadline) {
+//                        writer.write("\n" + "D | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " + taskList.get(i).getDescription() + " /by "
+//                                + ((Deadline) taskList.get(i)).getBy().trim());
+//                    }
+//                    else if (taskList.get(i) instanceof Todo) {
+//                        writer.write("\n" + "T | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " + taskList.get(i).getDescription());
+//                    }else if (taskList.get(i) instanceof Event) {
+//                        writer.write("\n" + "E | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " + taskList.get(i).getDescription()
+//                                +" /from "+((Event) taskList.get(i)).getFrom().trim()+ " /to "+((Event) taskList.get(i)).getTo().trim());
+//                    }
+//                }
+//                writer.close();
+//            } catch (IOException e) {
+//                ui.errorSavingUpdatedTaskMessage();
+//            }
+//        }
 
 
     private static void handleUnmark(String line, ArrayList<Task> taskList) {
         try {
-            String stringTaskNumber = line.split(" ")[1];
-            if(stringTaskNumber.trim().isEmpty()){
-                throw new emptyCommandParameterException();
-            }
-            int taskNumber = Integer.parseInt(stringTaskNumber)-1;
+            int taskNumber = parser.getTaskNumber(line);
             if(taskNumber>=Task.taskCount||taskNumber<0){
                 ui.outOfBoundsMessage();
             }else {
@@ -224,16 +257,20 @@ public class Ultron {
             ui.errorHandleUnmark();
         }
     }
-
+//
+//    private static int getTaskNumber(String line) throws emptyCommandParameterException {
+//        String stringTaskNumber = line.split(" ")[1];
+//        if(stringTaskNumber.trim().isEmpty()){
+//            throw new emptyCommandParameterException();
+//        }
+//        int taskNumber = Integer.parseInt(stringTaskNumber)-1;
+//        return taskNumber;
+//    }
 
 
     private static void handleMark(String line, ArrayList<Task> taskList) {
         try {
-            String stringTaskNumber = line.split(" ")[1];
-            int taskNumber = Integer.parseInt(stringTaskNumber)-1;
-            if(stringTaskNumber.trim().isEmpty()){
-                throw new emptyCommandParameterException();
-            }
+            int taskNumber = parser.getTaskNumber(line);
             if(taskNumber>=Task.taskCount||taskNumber<0){
                 ui.outOfBoundsMessage();
             }else {
@@ -250,11 +287,7 @@ public class Ultron {
 
     private static void handleDelete(String line, ArrayList<Task> taskList) {
         try {
-            String stringTaskNumber = line.split(" ")[1];
-            if(stringTaskNumber.trim().isEmpty()){
-                throw new emptyCommandParameterException();
-            }
-            int taskNumber = Integer.parseInt(stringTaskNumber)-1;
+            int taskNumber = parser.getTaskNumber(line);
             if(taskNumber>=Task.taskCount||taskNumber<0){
                 ui.outOfBoundsMessage();
             }else {

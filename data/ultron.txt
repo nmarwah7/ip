@@ -2,3 +2,4 @@
 E | /done 1 /description something big /from then /to now
 D | /done 0 /description assignment /by eow
 E | /done 1 /description something self /from there /to here
+D | /done 0 /description quiz /by tomorrow
