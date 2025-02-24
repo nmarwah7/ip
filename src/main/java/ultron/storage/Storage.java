@@ -1,9 +1,11 @@
-package ultron;
+package ultron.storage;
 
+import ultron.tasks.Tasklist;
 import ultron.tasks.Deadline;
 import ultron.tasks.Event;
 import ultron.tasks.Task;
 import ultron.tasks.Todo;
+import ultron.ui.Ui;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,9 +16,10 @@ import java.util.Scanner;
 
 public class Storage {
     private static Ui ui = null; // Store Ui instance
-
-    public Storage(Ui ui) {
+    private static Tasklist tasklist;
+    public Storage(Ui ui, Tasklist tasklist) {
         Storage.ui = ui;
+        Storage.tasklist = tasklist;
     }
     public File getTaskStorageFile() {
         String directoryPath = "data";
@@ -49,15 +52,15 @@ public class Storage {
                         .split("/description", 2)[0].trim().equals("0")) ;
                 switch (taskType) {
                 case "T":
-                    Ultron.handleTodo(taskDescription, taskList, true);
+                    tasklist.handleTodo(taskDescription, taskList, true);
                     taskList.get(Task.taskCount-1).setDone(isDoneTask);
                     break;
                 case "D":
-                    Ultron.handleDeadline("deadline"+ taskDescription, taskList, true);
+                    tasklist.handleDeadline("deadline"+ taskDescription, taskList, true);
                     taskList.get(Task.taskCount-1).setDone(isDoneTask);
                     break;
                 case "E":
-                    Ultron.handleEvent("event"+taskDescription, taskList, true);
+                    tasklist.handleEvent("event"+taskDescription, taskList, true);
                     taskList.get(Task.taskCount-1).setDone(isDoneTask);
                     break;
                 default:

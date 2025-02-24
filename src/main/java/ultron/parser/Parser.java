@@ -1,5 +1,6 @@
-package ultron;
+package ultron.parser;
 
+import ultron.Ultron;
 import ultron.exceptions.emptyCommandParameterException;
 
 public class Parser {

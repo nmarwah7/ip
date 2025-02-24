@@ -1,4 +1,4 @@
-package ultron;
+package ultron.ui;
 
 import ultron.tasks.Task;
 
@@ -37,7 +37,7 @@ public class Ui {
         System.out.println("    event what?! Say something. event cannot have a blank description or blank time-frame.");
         dashLine();
     }
-    protected  void deadlineDescriptionErrorMessage() {
+    public  void deadlineDescriptionErrorMessage() {
         dashLine();
         System.out.println("    deadline what?! Say something. deadline cannot have a blank description or time.");
         dashLine();
