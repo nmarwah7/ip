@@ -40,7 +40,7 @@ will be empty when the app is first launched.
 5. Type the command in the terminal window and press Enter to execute it. e.g. typing list and pressing Enter will list all stored tasks.
 Some example commands you can try:
 
-   ` list` : Lists all tasks.
+   `list` : Lists all tasks.
 
     `todo finish my work`  : Adds a task you have to do with a brief description.
 
@@ -65,18 +65,21 @@ _**Format**_: `list`
 Adds a simple task you have to do with a description.
 
 _**Format**_: `todo <description>`
+
 _**Example**_: `todo finish my work`
 
 ### Adding deadline tasks: `deadline`
 Adds a deadline task you have to do with a description and a due by date.
 
 _**Format**_: `deadline <description> /by <YYYY-MM-DD>`
+
 _**Example**_: `deadline assignment /by 2023-01-11`
 
 ### Adding event tasks: `event`
 Adds an event task you have to do with a description and a time frame.
 
 _**Format**_: `event <description> /from <some time> /to <some time>`
+
 _**Example**_: `event open house /from monday /to friday`
 
 ### Marking a task as completed: `mark`
@@ -84,7 +87,9 @@ Marks a task in the list as completed (denoted by an X next to the task descript
 
 -Edits the task at the specified list_index. The index refers to the index number shown in the displayed task list. The index must be a positive integer 1, 2, 3, …
 and must correspond to an existing task in the list.
+
 _**Format**_: `mark <list_index>`
+
 _**Example**_: `mark 1`
 
 ![Screenshot of mark done in terminal.](/docs/mark.png)
@@ -93,6 +98,7 @@ Unmarks a completed task in the list as not completed.
 
 -Edits the task at the specified list_index. The index refers to the index number shown in the displayed task list. The index must be a positive integer 1, 2, 3, …
 and must correspond to an existing task in the list.
+
 _**Format**_: `unmark <list_index>`
 
 ### Deleting a task `delete`
@@ -100,12 +106,15 @@ Deletes a task in the list.
 
 -Deletes the task at the specified list_index. The index refers to the index number shown in the displayed task list. The index must be a positive integer 1, 2, 3, …
 and must correspond to an existing task in the list.
+
 _**Format**_: `delete <list_index>`
 
 ### Finding a task `find`
 Finds tasks whose names contain any of the given keywords.
 -Note: the keyword is case-sensitive.
+
 _**Format**_: `find <keyword>`
+
 _**Example**_: `find assigment`
 
 
@@ -113,10 +122,12 @@ _**Example**_: `find assigment`
 Finds deadline tasks on a particular date.
 -Note: the date format must be of YYY-MM-DD.
 _**Format**_: `datefind <YYY-MM-DD>`
+
 _**Example**_: `datefind 2023-01-01`
 
 ### Exit `bye`
 Exits the program.
+
 _**Format**_: `bye`
 
 ## Saving the data
@@ -130,7 +141,7 @@ Ultron task data is saved in the hard disk automatically after any command that 
 
 Ultron task data is saved automatically as a .txt file [JAR file location]/data/data.txt. Advanced users are welcome to update data directly by editing that data file.
 
-> [!CAUTION]
+> CAUTION!:
 > The data file has particular formatting, any change to this file that violates this formatting could **corrupt the data** and would require the data file to be deleted
 and started again. Therefore, edit the data file only if you are confident that you can update it correctly.
 
@@ -145,10 +156,10 @@ command parameters.
 
 ## Command Summary
 | Action        | Format, Examples                                                                                             |
-|---------------|--------------------------------------------------------------------------------------------------------------|
+|--------------|--------------------------------------------------------------------------------------------------------------|
 | **Todo**      | `todo <description>`<br>e.g., `todo some work`                                                               |
-| **Deadline**  | `deadline <description> /by <YYYY-MM-DD>`   <br>e.g.,`deadline work /by 2023-01-01`                          |
-| **Event**     | `event <description> /from <some time> /to <some time`   <br>e.g.,`event open house /from monday /to friday` |
+| **Deadline**  | `deadline <description> /by <YYYY-MM-DD>`<br>e.g., `deadline work /by 2023-01-01`                          |
+| **Event**     | `event <description> /from <some time> /to <some time>`<br>e.g., `event open house /from monday /to friday` |
 | **Mark**      | `mark <index>`<br>e.g., `mark 1`                                                                             |
 | **Delete**    | `delete <index>`<br>e.g., `delete 3`                                                                         |
 | **Unmark**    | `unmark <index>`<br>e.g., `unmark 1`                                                                         |
@@ -156,4 +167,5 @@ command parameters.
 | **Date Find** | `datefind <YYYY-MM-DD>`<br>e.g., `datefind 2023-01-01`                                                       |
 | **List**      | `list`                                                                                                       |
 | **Exit**      | `bye`                                                                                                        |
+
 
