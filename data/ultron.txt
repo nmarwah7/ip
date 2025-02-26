@@ -1,7 +1,6 @@
 
-D | /done 1 /description assignment /by eow
 E | /done 1 /description something self /from there /to here
-D | /done 1 /description quiz /by tomorrow
-D | /done 0 /description of this /by thne
 E | /done 0 /description of this /from then /to now
 T | /done 0 /description this
+D | /done 0 /description assignment /by 2023-12-01
+D | /done 0 /description quiz /by 2022-12-12

@@ -4,6 +4,9 @@ import ultron.Ultron;
 import ultron.exceptions.emptyCommandParameterException;
 import ultron.parser.Parser;
 import ultron.ui.Ui;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 import java.util.ArrayList;
 
@@ -26,6 +29,24 @@ public class Tasklist {
             }
         } catch (emptyCommandParameterException | ArrayIndexOutOfBoundsException e) {
             ui.eventDescriptionErrorMessage();
+        }
+    }
+    public void findDeadlineByDate(ArrayList<Task> taskList, String line){
+        String date = (line.split(" ",2)[1]);
+        ArrayList<Task> filteredList = new ArrayList<>();
+        int filteredIndex = 0;
+        for(int i = 0; i<Task.taskCount;i++){
+            if(taskList.get(i) instanceof Deadline){
+                if (((Deadline) taskList.get(i)).getBy().equals(date.trim())){
+                    filteredList.add(taskList.get(i));
+                    filteredIndex++;;
+                }
+            }
+        }
+        for(int k = 0; k<filteredIndex;k++){
+            ui.dashLine();
+            System.out.println("    "+(k+1)+". "+ filteredList.get(k));
+            ui.dashLine();
         }
     }
 

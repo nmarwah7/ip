@@ -10,7 +10,7 @@ import ultron.ui.Ui;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.File;
-;
+
 
 public class Ultron {
 
@@ -81,6 +81,9 @@ public class Ultron {
                     break;
                 case "delete":
                     tasklist.handleDelete(line, taskList);
+                    break;
+                case "datefind":
+                    tasklist.findDeadlineByDate(taskList,line);
                     break;
                 default:
                     throw new unspecifiedCommandException();
