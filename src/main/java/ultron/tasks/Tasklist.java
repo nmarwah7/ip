@@ -36,6 +36,7 @@ public class Tasklist {
         }
     }
 
+
     public void findDeadlineByDate(ArrayList<Task> taskList, String line) {
         try {
             String date = (line.split(" ", 2)[1]);
@@ -63,6 +64,7 @@ public class Tasklist {
         }
     }
 
+
     public void handleDeadline(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {
             Ultron.DeadlineParameters parsedParams = parser.getDeadlineParameters(line);
@@ -75,6 +77,35 @@ public class Tasklist {
             ui.deadlineDescriptionErrorMessage();
         }
     }
+
+
+    public void handleFind(String line, ArrayList<Task> taskList) {
+        try {
+            String find = line.split(" ", 2)[1];
+            if (find.trim().isEmpty()){
+                throw new emptyCommandParameterException();
+            }
+            ArrayList<Task> filteredList = new ArrayList<>();
+            int filteredIndex = 0;
+            for (int i = 0; i < Task.taskCount; i++) {
+                if (taskList.get(i).getDescription().contains(find)) {
+                    filteredList.add(taskList.get(i));
+                    filteredIndex++;
+                }
+            }
+            ui.dashLine();
+            for (int k = 0; k < filteredIndex; k++) {
+
+                System.out.println("    " + (k + 1) + ". " + filteredList.get(k));
+
+            }
+            ui.dashLine();
+        } catch (ArrayIndexOutOfBoundsException| emptyCommandParameterException e) {
+            ui.findIndexErrorMessage();
+        }
+
+    }
+
 
     public void handleTodo(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {

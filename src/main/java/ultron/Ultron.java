@@ -86,6 +86,8 @@ public class Ultron {
                     break;
                 case "datefind":
                     tasklist.findDeadlineByDate(taskList, line);
+                case "find":
+                    tasklist.handleFind(line, taskList);
                     break;
                 default:
                     throw new unspecifiedCommandException();

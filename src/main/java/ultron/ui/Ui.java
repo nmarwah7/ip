@@ -132,6 +132,12 @@ public class Ui {
         System.out.println("    " + taskList.get(taskNumber));
         dashLine();
     }
+    public void findIndexErrorMessage() {
+        dashLine();
+        System.out.println("    This is not a valid command. Type in command find x where x is a valid " +
+                "task description.");
+        dashLine();
+    }
 
     public void errorHandleDelete() {
         dashLine();
