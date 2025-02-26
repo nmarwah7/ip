@@ -1,5 +1,7 @@
 package ultron.tasks;
-
+/**
+ * Subclass of Task type with added parameters: from and to.
+ */
 public class Event extends Task{
     protected String from;
     protected String to;

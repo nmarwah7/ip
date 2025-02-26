@@ -1,5 +1,7 @@
 package ultron.tasks;
-
+/**
+ * General parent class for Task type with 2 parameters: description and done status
+ */
 public class Task {
     protected String description;
     protected boolean isDone;
@@ -15,7 +17,9 @@ public class Task {
         this.isDone = false;
         taskCount++;
     }
-
+    /**
+     * Prints out X if task is done.
+     */
     public String getStatusIcon() {
         return (isDone ? "X" : " "); // mark done task with X
     }
@@ -35,7 +39,9 @@ public class Task {
     public void setDone(boolean done) {
         isDone = done;
     }
-
+    /**
+     * Prints out task description and done status.
+     */
     public String toString() {
         return "["+getStatusIcon()+"] "+getDescription();
     }
