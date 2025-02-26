@@ -24,8 +24,10 @@ public class Ultron {
         tasklist = new Tasklist(ui,parser);
         storage = new Storage(ui,tasklist);
 
-
     }
+    /**
+     * Begins the chat with Ultron by displaying welcome message and accepting user input in a command loop until exit
+     */
     public void startChat(){
         Tasks populatedTasks = getTasks();
         System.out.println(ui.ULTRON_FACE);
@@ -35,6 +37,9 @@ public class Ultron {
         runCommandLoopUntilExit(populatedTasks.taskList(), line, in);
         exit(populatedTasks.taskStorageFile(), populatedTasks.taskList());
     }
+    /**
+     * Loads previously saved task data from data directory and loading it into the tasklist used in current user session
+     */
 
     private static Tasks getTasks() {
         ArrayList<Task> taskList= new ArrayList<>();
@@ -51,7 +56,11 @@ public class Ultron {
         storage.updateStoredTasks(taskStorageFile, taskList);
         ui.byeMessage();
     }
-
+    /**
+     * Starts a command loop which repeatedly parses user input to find and execute the associated command until exit
+     * command "bye".
+     * @throws unspecifiedCommandException if a user input is different from set list of available commands
+     */
     private static void runCommandLoopUntilExit( ArrayList<Task> taskList, String line, Scanner in) {
         String command = parser.userCommand(line);
         //the below switch-case refactoring is inspired by @James17042002

@@ -2,11 +2,14 @@ package ultron.tasks;
 
 import ultron.Ultron;
 import ultron.exceptions.emptyCommandParameterException;
+import ultron.exceptions.unspecifiedCommandException;
 import ultron.parser.Parser;
 import ultron.ui.Ui;
 
 import java.util.ArrayList;
-
+/**
+ * Performs methods to add/delete/perform executive functions on tasks stored in the task list
+ */
 public class Tasklist {
     private static Ui ui = null; // Store Ui instance
 
@@ -16,6 +19,14 @@ public class Tasklist {
         Tasklist.parser = parser;
     }
     public ArrayList<Task> taskList= new ArrayList<>();
+    /**
+     * Handles the creation of a task of type event. This involves invoking the parser to obtain user parameters
+     * for the event specified then creating a task of Event type and adding it to task list.
+     * @throws emptyCommandParameterException if a user input does not involve all the required parameters of description
+     * and from and to date.
+     * @throws ArrayIndexOutOfBoundsException if there is some incorrect formatting of syntax such that parser cannot
+     * find the required parameters from user input.
+     */
     public  void handleEvent(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {
             Ultron.EventParameters parsedParams = parser.getEventParameters(line);
@@ -28,7 +39,14 @@ public class Tasklist {
             ui.eventDescriptionErrorMessage();
         }
     }
-
+    /**
+     * Handles the creation of a task of type deadline. This involves invoking the parser to obtain user parameters
+     * for the deadline specified then creating a task of Deadline type and adding it to task list.
+     * @throws emptyCommandParameterException if a user input does not involve all the required parameters of description
+     * and due by date.
+     * @throws ArrayIndexOutOfBoundsException if there is some incorrect formatting of syntax such that parser cannot
+     * find the required parameters from user input.
+     */
     public  void handleDeadline(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {
             Ultron.DeadlineParameters parsedParams = parser.getDeadlineParameters(line);
@@ -40,6 +58,13 @@ public class Tasklist {
             ui.deadlineDescriptionErrorMessage();
         }
     }
+    /**
+     * Handles the creation of a task of type to-do. This involves invoking the parser to obtain user parameters
+     * for the deadline specified then creating a task of Todo type and adding it to task list.
+     * @throws emptyCommandParameterException if a user input does not involve all the required parameters of description
+     * @throws ArrayIndexOutOfBoundsException if there is some incorrect formatting of syntax such that parser cannot
+     * find the required parameters from user input.
+     */
     public void handleTodo(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {
             String todoDescription = parser.getTodoParameters(line);
@@ -52,6 +77,14 @@ public class Tasklist {
             ui.todoDescriptionErrorMessage();
         }
     }
+    /**
+     * Handles the unmarking a task in the list by setting it to not done. This involves invoking the parser to
+     * obtain index to be unmarked and making the change to corresponding task in task list.
+     * @throws emptyCommandParameterException if a user input does not involve required parameters of index
+     * @throws ArrayIndexOutOfBoundsException if there is some incorrect formatting of syntax such that parser cannot
+     * find the required parameters from user input.
+     * @throws NumberFormatException if a user does not input the numerical value of an index.
+     */
     public void handleUnmark(String line, ArrayList<Task> taskList) {
         try {
             int taskNumber = parser.getTaskNumber(line);
@@ -65,7 +98,14 @@ public class Tasklist {
             ui.errorHandleUnmark();
         }
     }
-
+    /**
+     * Handles the marking a task in the list by setting it to done. This involves invoking the parser to
+     * obtain index to be marked and making the change to corresponding task in task list.
+     * @throws emptyCommandParameterException if a user input does not involve required parameters of index
+     * @throws ArrayIndexOutOfBoundsException if there is some incorrect formatting of syntax such that parser cannot
+     * find the required parameters from user input.
+     * @throws NumberFormatException if a user does not input the numerical value of an index.
+     */
     public void handleMark(String line, ArrayList<Task> taskList) {
         try {
             int taskNumber = parser.getTaskNumber(line);
@@ -79,10 +119,14 @@ public class Tasklist {
             ui.errorHandleMarkCommand();
         }
     }
-
-
-
-
+    /**
+     * Handles the deleting a specified task in the list. This involves invoking the parser to
+     * obtain index to be deleted and removign it from the list.
+     * @throws emptyCommandParameterException if a user input does not involve required parameter of index.
+     * @throws ArrayIndexOutOfBoundsException if there is some incorrect formatting of syntax such that parser cannot
+     * find the required parameters from user input.
+     * @throws NumberFormatException if a user does not input the numerical value of an index.
+     */
     public void handleDelete(String line, ArrayList<Task> taskList) {
         try {
             int taskNumber = parser.getTaskNumber(line);
