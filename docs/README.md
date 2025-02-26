@@ -155,17 +155,52 @@ command parameters.
 
 
 ## Command Summary
-| Action        | Format, Examples                                                                                             |
-|--------------|--------------------------------------------------------------------------------------------------------------|
-| **Todo**      | `todo <description>`<br>e.g., `todo some work`                                                               |
-| **Deadline**  | `deadline <description> /by <YYYY-MM-DD>`<br>e.g., `deadline work /by 2023-01-01`                          |
-| **Event**     | `event <description> /from <some time> /to <some time>`<br>e.g., `event open house /from monday /to friday` |
-| **Mark**      | `mark <index>`<br>e.g., `mark 1`                                                                             |
-| **Delete**    | `delete <index>`<br>e.g., `delete 3`                                                                         |
-| **Unmark**    | `unmark <index>`<br>e.g., `unmark 1`                                                                         |
-| **Find**      | `find <keyword>`<br>e.g., `find assignment`                                                                  |
-| **Date Find** | `datefind <YYYY-MM-DD>`<br>e.g., `datefind 2023-01-01`                                                       |
-| **List**      | `list`                                                                                                       |
-| **Exit**      | `bye`                                                                                                        |
+<table>
+  <tr>
+    <th>Action</th>
+    <th>Format, Examples</th>
+  </tr>
+  <tr>
+    <td><b>Todo</b></td>
+    <td><code>todo &lt;description&gt;</code><br>e.g., <code>todo some work</code></td>
+  </tr>
+  <tr>
+    <td><b>Deadline</b></td>
+    <td><code>deadline &lt;description&gt; /by &lt;YYYY-MM-DD&gt;</code><br>e.g., <code>deadline work /by 2023-01-01</code></td>
+  </tr>
+  <tr>
+    <td><b>Event</b></td>
+    <td><code>event &lt;description&gt; /from &lt;some time&gt; /to &lt;some time&gt;</code><br>e.g., <code>event open house /from monday /to friday</code></td>
+  </tr>
+  <tr>
+    <td><b>Mark</b></td>
+    <td><code>mark &lt;index&gt;</code><br>e.g., <code>mark 1</code></td>
+  </tr>
+  <tr>
+    <td><b>Delete</b></td>
+    <td><code>delete &lt;index&gt;</code><br>e.g., <code>delete 3</code></td>
+  </tr>
+  <tr>
+    <td><b>Unmark</b></td>
+    <td><code>unmark &lt;index&gt;</code><br>e.g., <code>unmark 1</code></td>
+  </tr>
+  <tr>
+    <td><b>Find</b></td>
+    <td><code>find &lt;keyword&gt;</code><br>e.g., <code>find assignment</code></td>
+  </tr>
+  <tr>
+    <td><b>Date Find</b></td>
+    <td><code>datefind &lt;YYYY-MM-DD&gt;</code><br>e.g., <code>datefind 2023-01-01</code></td>
+  </tr>
+  <tr>
+    <td><b>List</b></td>
+    <td><code>list</code></td>
+  </tr>
+  <tr>
+    <td><b>Exit</b></td>
+    <td><code>bye</code></td>
+  </tr>
+</table>
+
 
 
