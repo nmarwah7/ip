@@ -82,6 +82,9 @@ public class Ultron {
                 case "delete":
                     tasklist.handleDelete(line, taskList);
                     break;
+                case "find":
+                    tasklist.handleFind(line, taskList);
+                    break;
                 default:
                     throw new unspecifiedCommandException();
                 }

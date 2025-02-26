@@ -31,7 +31,7 @@ public class Parser {
     public record DeadlineParameters(String deadlineDescription, String deadlineBy) {
     }
     public String getTodoParameters(String line) throws emptyCommandParameterException {
-        String todoDescription = line.split(" ",2)[1];
+        String todoDescription = line.split(" ",2)[1].trim();
         if(todoDescription.trim().isEmpty()){
             throw new emptyCommandParameterException();
         }
