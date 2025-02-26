@@ -13,7 +13,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+/**
+ * Loads tasks entered by user as data stored in local memory of device, and retrieves these saved tasks when a new CLI
+ * session is opened by the user.
+ */
 public class Storage {
     private static Ui ui = null; // Store Ui instance
     private static Tasklist tasklist;
@@ -21,6 +24,12 @@ public class Storage {
         Storage.ui = ui;
         Storage.tasklist = tasklist;
     }
+    /**
+     * Returns the file data.txt where previously saved tasks are stored. A new storage file and /data directory is
+     * created if they don't exist already.
+     * @throws IOException if new file is not successfully created.
+     * @return .txt file where task data is stored.
+     */
     public File getTaskStorageFile() {
         String directoryPath = "data";
         String filePath = directoryPath + "/ultron.txt";
@@ -38,6 +47,13 @@ public class Storage {
         }
         return taskStorageFile;
     }
+    /**
+     * Loads all tasks saved in data.txt file into task list initialized in every CLI session. This involves reading
+     * data from the file, splitting the lines based on their predefined syntax and calling the handleTasks methods
+     * to appropriately restore these tasks.
+     * @throws ArrayIndexOutOfBoundsException if syntax or formatting error in data saved in the file.
+     * @throws FileNotFoundException if data.txt file is not found in the data directory.
+     */
     public void loadPreviousTaskData(File taskStorageFile, ArrayList<Task> taskList) {
         try {
             Scanner s = new Scanner(taskStorageFile);
@@ -72,6 +88,11 @@ public class Storage {
             ui.errorLoadingMessage();
         }
     }
+    /**
+     * Saves all added tasks and updated tasks back into data.txt at the end of CLI session with user. This involves
+     * reformatting all tasks in the task list to match predefined syntax for the data.txt file.
+     * @throws IOException if data cannot be saved correctly to file
+     */
     public void updateStoredTasks(File taskStorageFile, ArrayList<Task> taskList){
         try {
             FileWriter writer = new FileWriter(taskStorageFile);

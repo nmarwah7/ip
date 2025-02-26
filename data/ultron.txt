@@ -1,6 +1,6 @@
 
 E | /done 1 /description something self /from there /to here
-T | /done 0 /description this
-D | /done 0 /description assignment /by 2023-12-01
-D | /done 0 /description quiz /by 2022-12-12
-D | /done 0 /description this /by 2021-11-11
+E | /done 1 /description of this /from then /to now
+E | /done 0 /description somethign to check /from then /to now
+D | /done 0 /description of this work /by 1990-01-01
+E | /done 0 /description from something /from then /to now

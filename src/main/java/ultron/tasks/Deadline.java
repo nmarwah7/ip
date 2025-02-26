@@ -1,4 +1,7 @@
 package ultron.tasks;
+/**
+ * Subclass of Task type with added parameters: due by date
+ */
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
