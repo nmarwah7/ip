@@ -6,6 +6,10 @@ import ultron.exceptions.unspecifiedCommandException;
 import ultron.parser.Parser;
 import ultron.ui.Ui;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
 import java.util.ArrayList;
 /**
  * Performs methods to add/delete/perform executive functions on tasks stored in the task list
@@ -14,10 +18,12 @@ public class Tasklist {
     private static Ui ui = null; // Store Ui instance
 
     private static Parser parser;
-    public Tasklist(Ui ui,  Parser parser) {
+
+    public Tasklist(Ui ui, Parser parser) {
         Tasklist.ui = ui;
         Tasklist.parser = parser;
     }
+
     public ArrayList<Task> taskList= new ArrayList<>();
     /**
      * Handles the creation of a task of type event. This involves invoking the parser to obtain user parameters
@@ -39,6 +45,7 @@ public class Tasklist {
             ui.eventDescriptionErrorMessage();
         }
     }
+
     /**
      * Handles the creation of a task of type deadline. This involves invoking the parser to obtain user parameters
      * for the deadline specified then creating a task of Deadline type and adding it to task list.
@@ -47,17 +54,47 @@ public class Tasklist {
      * @throws ArrayIndexOutOfBoundsException if there is some incorrect formatting of syntax such that parser cannot
      * find the required parameters from user input.
      */
-    public  void handleDeadline(String line, ArrayList<Task> taskList, boolean inStoredTask) {
+    public void findDeadlineByDate(ArrayList<Task> taskList, String line) {
+        try {
+            String date = (line.split(" ", 2)[1]);
+            if (date.trim().isEmpty()) {
+                throw new emptyCommandParameterException();
+            }
+            ArrayList<Task> filteredList = new ArrayList<>();
+            int filteredIndex = 0;
+            for (int i = 0; i < Task.taskCount; i++) {
+                if (taskList.get(i) instanceof Deadline) {
+                    if (((Deadline) taskList.get(i)).getBy().equals(date.trim())) {
+                        filteredList.add(taskList.get(i));
+                        filteredIndex++;
+                        ;
+                    }
+                }
+            }
+            ui.dashLine();
+            for (int k = 0; k < filteredIndex; k++) {
+                System.out.println("    " + (k + 1) + ". " + filteredList.get(k));
+            }
+            ui.dashLine();
+        } catch (ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
+            ui.dateFindErrorMessage();
+        }
+    }
+
+
+    public void handleDeadline(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {
             Ultron.DeadlineParameters parsedParams = parser.getDeadlineParameters(line);
 
             taskList.add(Task.taskCount, new Deadline(parsedParams.deadlineDescription(), parsedParams.deadlineBy()));
             if (!inStoredTask) {
                 ui.taskAddedMessage(taskList, " deadline ");
-            }        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
+            }
+        } catch (emptyCommandParameterException | ArrayIndexOutOfBoundsException e) {
             ui.deadlineDescriptionErrorMessage();
         }
     }
+
     /**
      * Handles the creation of a task of type to-do. This involves invoking the parser to obtain user parameters
      * for the deadline specified then creating a task of Todo type and adding it to task list.
@@ -65,6 +102,35 @@ public class Tasklist {
      * @throws ArrayIndexOutOfBoundsException if there is some incorrect formatting of syntax such that parser cannot
      * find the required parameters from user input.
      */
+
+    public void handleFind(String line, ArrayList<Task> taskList) {
+        try {
+            String find = line.split(" ", 2)[1];
+            if (find.trim().isEmpty()){
+                throw new emptyCommandParameterException();
+            }
+            ArrayList<Task> filteredList = new ArrayList<>();
+            int filteredIndex = 0;
+            for (int i = 0; i < Task.taskCount; i++) {
+                if (taskList.get(i).getDescription().contains(find)) {
+                    filteredList.add(taskList.get(i));
+                    filteredIndex++;
+                }
+            }
+            ui.dashLine();
+            for (int k = 0; k < filteredIndex; k++) {
+
+                System.out.println("    " + (k + 1) + ". " + filteredList.get(k));
+
+            }
+            ui.dashLine();
+        } catch (ArrayIndexOutOfBoundsException| emptyCommandParameterException e) {
+            ui.findIndexErrorMessage();
+        }
+
+    }
+
+
     public void handleTodo(String line, ArrayList<Task> taskList, boolean inStoredTask) {
         try {
             String todoDescription = parser.getTodoParameters(line);
@@ -73,10 +139,11 @@ public class Tasklist {
             if (!inStoredTask) {
                 ui.taskAddedMessage(taskList, " todo ");
             }
-        } catch (emptyCommandParameterException|ArrayIndexOutOfBoundsException e) {
+        } catch (emptyCommandParameterException | ArrayIndexOutOfBoundsException e) {
             ui.todoDescriptionErrorMessage();
         }
     }
+
     /**
      * Handles the unmarking a task in the list by setting it to not done. This involves invoking the parser to
      * obtain index to be unmarked and making the change to corresponding task in task list.
@@ -85,12 +152,13 @@ public class Tasklist {
      * find the required parameters from user input.
      * @throws NumberFormatException if a user does not input the numerical value of an index.
      */
+
     public void handleUnmark(String line, ArrayList<Task> taskList) {
         try {
             int taskNumber = parser.getTaskNumber(line);
-            if(taskNumber>=Task.taskCount||taskNumber<0){
+            if (taskNumber >= Task.taskCount || taskNumber < 0) {
                 ui.outOfBoundsMessage();
-            }else {
+            } else {
                 taskList.get(taskNumber).setDone(false);
                 ui.handleUnmarkErrorMessage(taskList, taskNumber);
             }
@@ -109,16 +177,17 @@ public class Tasklist {
     public void handleMark(String line, ArrayList<Task> taskList) {
         try {
             int taskNumber = parser.getTaskNumber(line);
-            if(taskNumber>=Task.taskCount||taskNumber<0){
+            if (taskNumber >= Task.taskCount || taskNumber < 0) {
                 ui.outOfBoundsMessage();
-            }else {
+            } else {
                 taskList.get(taskNumber).setDone(true);
                 ui.handleMarkMessage(taskList, taskNumber);
             }
-        } catch (NumberFormatException|ArrayIndexOutOfBoundsException|emptyCommandParameterException e) {
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
             ui.errorHandleMarkCommand();
         }
     }
+
     /**
      * Handles the deleting a specified task in the list. This involves invoking the parser to
      * obtain index to be deleted and removign it from the list.
@@ -127,12 +196,13 @@ public class Tasklist {
      * find the required parameters from user input.
      * @throws NumberFormatException if a user does not input the numerical value of an index.
      */
+
     public void handleDelete(String line, ArrayList<Task> taskList) {
         try {
             int taskNumber = parser.getTaskNumber(line);
-            if(taskNumber>=Task.taskCount||taskNumber<0){
+            if (taskNumber >= Task.taskCount || taskNumber < 0) {
                 ui.outOfBoundsMessage();
-            }else {
+            } else {
                 Task.taskCount--;
                 ui.handleDeleteMessage(taskList, taskNumber);
                 taskList.remove(taskNumber);

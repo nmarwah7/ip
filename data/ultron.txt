@@ -1,9 +1,6 @@
 
-D | /done 1 /description assignment /by eow
 E | /done 1 /description something self /from there /to here
-D | /done 1 /description quiz /by tomorrow
-D | /done 1 /description of this /by thne
-E | /done 0 /description of this /from then /to now
-T | /done 0 /description something else
+E | /done 1 /description of this /from then /to now
 E | /done 0 /description somethign to check /from then /to now
-D | /done 0 /description somehtign else /by then
+D | /done 0 /description of this work /by 1990-01-01
+E | /done 0 /description from something /from then /to now
