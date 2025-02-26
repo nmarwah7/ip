@@ -18,15 +18,17 @@ public class Ultron {
     private static Storage storage;
     private static Parser parser;
     private static Tasklist tasklist = null;
-    public Ultron(){
+
+    public Ultron() {
         ui = new Ui();
         parser = new Parser();
-        tasklist = new Tasklist(ui,parser);
-        storage = new Storage(ui,tasklist);
+        tasklist = new Tasklist(ui, parser);
+        storage = new Storage(ui, tasklist);
 
 
     }
-    public void startChat(){
+
+    public void startChat() {
         Tasks populatedTasks = getTasks();
         System.out.println(ui.ULTRON_FACE);
         ui.helloMessage();
@@ -37,7 +39,7 @@ public class Ultron {
     }
 
     private static Tasks getTasks() {
-        ArrayList<Task> taskList= new ArrayList<>();
+        ArrayList<Task> taskList = new ArrayList<>();
         File taskStorageFile = storage.getTaskStorageFile();
         storage.loadPreviousTaskData(taskStorageFile, taskList);
         return new Tasks(taskList, taskStorageFile);
@@ -52,12 +54,12 @@ public class Ultron {
         ui.byeMessage();
     }
 
-    private static void runCommandLoopUntilExit( ArrayList<Task> taskList, String line, Scanner in) {
+    private static void runCommandLoopUntilExit(ArrayList<Task> taskList, String line, Scanner in) {
         String command = parser.userCommand(line);
         //the below switch-case refactoring is inspired by @James17042002
-        while(!command.equals("bye")){
+        while (!command.equals("bye")) {
             try {
-                switch (command){
+                switch (command) {
                 case "list":
                     ui.dashLine();
                     ui.printTaskList(taskList);
@@ -83,7 +85,7 @@ public class Ultron {
                     tasklist.handleDelete(line, taskList);
                     break;
                 case "datefind":
-                    tasklist.findDeadlineByDate(taskList,line);
+                    tasklist.findDeadlineByDate(taskList, line);
                     break;
                 default:
                     throw new unspecifiedCommandException();
@@ -96,7 +98,7 @@ public class Ultron {
         }
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Ultron ultron = new Ultron();
         ultron.startChat();
     }
