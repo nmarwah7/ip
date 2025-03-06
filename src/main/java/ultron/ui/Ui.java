@@ -59,7 +59,8 @@ public class Ui {
      */
     public  void deadlineDescriptionErrorMessage() {
         dashLine();
-        System.out.println("    deadline what?! Say something. deadline cannot have a blank description or time.");
+        System.out.println("    deadline what?! Say something. deadline cannot have a blank description or time not in " +
+                "yyyy-mm-dd format.");
         dashLine();
     }
 
@@ -73,6 +74,8 @@ public class Ui {
     }
     /**
      * Prints out descriptive message when a new task is successfully added.
+     * @param taskType whether a task is of type Deadline, Event or Todo.
+     * @param taskList - task list of saved tasks
      */
     public  void taskAddedMessage(ArrayList<Task> taskList, String taskType) {
         dashLine();
@@ -180,7 +183,7 @@ public class Ui {
         dashLine();
     }
     /**
-     * Prints out a descriptive error message to user when the syntax of delete command is incorrect.
+     * Prints out a descriptive error message to user when the syntax of find command is incorrect.
      */
     public void findIndexErrorMessage() {
         dashLine();
@@ -188,24 +191,28 @@ public class Ui {
                 "task description.");
         dashLine();
     }
-
+    /**
+     * Prints out a descriptive error message to user when the syntax of delete command is incorrect.
+     */
     public void errorHandleDelete() {
         dashLine();
         System.out.println("    This is not a valid command. Type in command delete x where x is a valid " +
                 "task number.");
         dashLine();
     }
-    /**
-     * Prints out a descriptive  message to user when a task is deleted.
-     */
 
+    /**
+     * Prints out a descriptive  message to user when the syntax of datefind command is incorrect.
+     */
     public void dateFindErrorMessage() {
         dashLine();
         System.out.println("    This is not a valid command. Type in command datefind x where x is a valid " +
                 "date format of yyyy-mm-dd.");
         dashLine();
     }
-
+    /**
+     * Prints out a descriptive  message to user when a task is deleted.
+     */
     public void handleDeleteMessage(ArrayList<Task> taskList, int taskNumber) {
         dashLine();
         System.out.println("    Deleted this from your list.");

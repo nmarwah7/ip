@@ -51,6 +51,8 @@ public class Storage {
      * Loads all tasks saved in data.txt file into task list initialized in every CLI session. This involves reading
      * data from the file, splitting the lines based on their predefined syntax and calling the handleTasks methods
      * to appropriately restore these tasks.
+     * @param taskList list of saved tasks
+     * @param taskStorageFile .txt file location where previous task data is saved.
      * @throws ArrayIndexOutOfBoundsException if syntax or formatting error in data saved in the file.
      * @throws FileNotFoundException if data.txt file is not found in the data directory.
      */
