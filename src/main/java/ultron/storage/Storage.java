@@ -13,17 +13,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 /**
  * Loads tasks entered by user as data stored in local memory of device, and retrieves these saved tasks when a new CLI
  * session is opened by the user.
  */
 public class Storage {
+
     private static Ui ui = null; // Store Ui instance
     private static Tasklist tasklist;
+
+
     public Storage(Ui ui, Tasklist tasklist) {
         Storage.ui = ui;
         Storage.tasklist = tasklist;
     }
+
     /**
      * Returns the file data.txt where previously saved tasks are stored. A new storage file and /data directory is
      * created if they don't exist already.
@@ -47,16 +52,16 @@ public class Storage {
         }
         return taskStorageFile;
     }
+
     /**
      * Loads all tasks saved in data.txt file into task list initialized in every CLI session. This involves reading
      * data from the file, splitting the lines based on their predefined syntax and calling the handleTasks methods
      * to appropriately restore these tasks.
-     * @param taskList list of saved tasks
      * @param taskStorageFile .txt file location where previous task data is saved.
      * @throws ArrayIndexOutOfBoundsException if syntax or formatting error in data saved in the file.
      * @throws FileNotFoundException if data.txt file is not found in the data directory.
      */
-    public void loadPreviousTaskData(File taskStorageFile, ArrayList<Task> taskList) {
+    public void loadPreviousTaskData(File taskStorageFile) {
         try {
             Scanner s = new Scanner(taskStorageFile);
             while(s.hasNext()){
@@ -70,16 +75,16 @@ public class Storage {
                         .split("/description", 2)[0].trim().equals("0")) ;
                 switch (taskType) {
                 case "T":
-                    tasklist.handleTodo(taskDescription, taskList, true);
-                    taskList.get(Task.taskCount-1).setDone(isDoneTask);
+                    tasklist.handleTodo(taskDescription, true);
+                    tasklist.getTaskList().get(Task.taskCount-1).setDone(isDoneTask);
                     break;
                 case "D":
-                    tasklist.handleDeadline("deadline"+ taskDescription, taskList, true);
-                    taskList.get(Task.taskCount-1).setDone(isDoneTask);
+                    tasklist.handleDeadline("deadline"+ taskDescription, true);
+                    tasklist.getTaskList().get(Task.taskCount-1).setDone(isDoneTask);
                     break;
                 case "E":
-                    tasklist.handleEvent("event"+taskDescription, taskList, true);
-                    taskList.get(Task.taskCount-1).setDone(isDoneTask);
+                    tasklist.handleEvent("event"+taskDescription, true);
+                    tasklist.getTaskList().get(Task.taskCount-1).setDone(isDoneTask);
                     break;
                 default:
                     break;
@@ -90,6 +95,7 @@ public class Storage {
             ui.errorLoadingMessage();
         }
     }
+
     /**
      * Saves all added tasks and updated tasks back into data.txt at the end of CLI session with user. This involves
      * reformatting all tasks in the task list to match predefined syntax for the data.txt file.
@@ -100,14 +106,18 @@ public class Storage {
             FileWriter writer = new FileWriter(taskStorageFile);
             for(int i = 0; i<Task.taskCount;i++) {
                 if (taskList.get(i) instanceof Deadline) {
-                    writer.write("\n" + "D | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " + taskList.get(i).getDescription() + " /by "
-                            + ((Deadline) taskList.get(i)).getBy().trim());
+                    writer.write("\n" + "D | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " +
+                                taskList.get(i).getDescription() + " /by "
+                                + ((Deadline) taskList.get(i)).getBy().trim());
                 }
                 else if (taskList.get(i) instanceof Todo) {
-                    writer.write("\n" + "T | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " + taskList.get(i).getDescription());
+                    writer.write("\n" + "T | /done " + (taskList.get(i).isDone()?"1":"0") + " /description "
+                                + taskList.get(i).getDescription());
                 }else if (taskList.get(i) instanceof Event) {
-                    writer.write("\n" + "E | /done " + (taskList.get(i).isDone()?"1":"0") + " /description " + taskList.get(i).getDescription()
-                            +" /from "+((Event) taskList.get(i)).getFrom().trim()+ " /to "+((Event) taskList.get(i)).getTo().trim());
+                    writer.write("\n" + "E | /done " + (taskList.get(i).isDone()?"1":"0") + " /description "
+                                + taskList.get(i).getDescription()
+                                +" /from "+((Event) taskList.get(i)).getFrom().trim()+ " /to "
+                                +((Event) taskList.get(i)).getTo().trim());
                 }
             }
             writer.close();

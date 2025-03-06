@@ -36,7 +36,7 @@ robot built by Tony Stark that ultimately ends up trying to destroy everything).
 4. Open a command terminal, `cd` into the folder you put the jar file in, and use the  `java -jar ultron.jar` command to run the application.
 Ultron should appear in your terminal window as shown below. Note the app will generate a data.txt file in this home folder which
 will be empty when the app is first launched.
-   ![Screenshot of Ultron in terminal.](docs/terminal.png)
+   ![Screenshot of Ultron in terminal.](/docs/terminal.png)
 5. Type the command in the terminal window and press Enter to execute it. e.g. typing list and pressing Enter will list all stored tasks.
 Some example commands you can try:
 
@@ -92,7 +92,7 @@ _**Format**_: `mark <list_index>`
 
 _**Example**_: `mark 1`
 
-![Screenshot of mark done in terminal.](docs/mark.png)
+![Screenshot of mark done in terminal.](/docs/mark.png)
 ### Unmarking a task as not done: `unmark`
 Unmarks a completed task in the list as not completed.
 
@@ -133,7 +133,7 @@ _**Format**_: `bye`
 ## Saving the data
 Ultron task data is saved in the hard disk automatically after any command that changes the data. There is no need to save manually.
 
-![Alt text.](docs/datafile.png)
+![Alt text.](/docs/datafile.png)
 
 
 
