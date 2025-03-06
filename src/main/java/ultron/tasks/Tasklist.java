@@ -268,6 +268,7 @@ public class Tasklist {
                     break;
                 case "datefind":
                     findDeadlineByDate(line);
+                    break;
                 case "find":
                     handleFind(line);
                     break;
