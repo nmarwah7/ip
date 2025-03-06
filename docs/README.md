@@ -3,7 +3,7 @@
 
 Ultron is a ***command line interface chatbot*** which helps manage, organize and track tasks for the user through an 
 interactive and uniquely personalized interface that mimics the Avengers character named Ultron (an artifical intelligence
-robot built by Tony Stark that ultimately ends up trying to destroy everything). 
+robot built by Tony Stark that ultimately goes rogue). 
 ## Table of Contents
 
 <!-- TOC -->
@@ -68,6 +68,8 @@ _**Format**_: `todo <description>`
 
 _**Example**_: `todo finish my work`
 
+![Screenshot of Ultron in terminal.](todo.png)
+
 ### Adding deadline tasks: `deadline`
 Adds a deadline task you have to do with a description and a due by date.
 
@@ -124,6 +126,9 @@ Finds deadline tasks on a particular date.
 _**Format**_: `datefind <YYY-MM-DD>`
 
 _**Example**_: `datefind 2023-01-01`
+
+![Screenshot of Ultron in terminal.](datefind.png)
+
 
 ### Exit `bye`
 Exits the program.
