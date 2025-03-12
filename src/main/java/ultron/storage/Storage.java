@@ -20,7 +20,7 @@ import java.util.Scanner;
  */
 public class Storage {
 
-    private static Ui ui = null; // Store Ui instance
+    private static Ui ui = null;
     private static Tasklist tasklist;
 
 

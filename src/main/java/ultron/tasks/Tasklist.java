@@ -1,7 +1,7 @@
 package ultron.tasks;
 
-import ultron.exceptions.emptyCommandParameterException;
-import ultron.exceptions.unspecifiedCommandException;
+import ultron.exceptions.EmptyCommandParameterException;
+import ultron.exceptions.UnspecifiedCommandException;
 import ultron.parser.Parser;
 import ultron.ui.Ui;
 
@@ -29,6 +29,8 @@ public class Tasklist {
     }
 
     public ArrayList<Task> taskList= new ArrayList<>();
+
+    
     /**
      * Handles the creation of a task of type event. This involves invoking the parser to obtain user parameters
      * for the event specified then creating a task of Event type and adding it to task list.
@@ -47,7 +49,7 @@ public class Tasklist {
             if (!inStoredTask) {
                 ui.taskAddedMessage(taskList, " event ");
             }
-        } catch (emptyCommandParameterException | ArrayIndexOutOfBoundsException e) {
+        } catch (EmptyCommandParameterException | ArrayIndexOutOfBoundsException e) {
             ui.eventDescriptionErrorMessage();
         }
     }
@@ -63,7 +65,7 @@ public class Tasklist {
         try {
             String date = (line.split(" ", 2)[1]);
             if (date.trim().isEmpty()) {
-                throw new emptyCommandParameterException();
+                throw new EmptyCommandParameterException();
             }
             ArrayList<Task> filteredList = new ArrayList<>();
             int filteredIndex = 0;
@@ -81,7 +83,7 @@ public class Tasklist {
             }
             ui.dashLine();
 
-        } catch (ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
+        } catch (ArrayIndexOutOfBoundsException | EmptyCommandParameterException e) {
             ui.dateFindErrorMessage();
         }
 
@@ -104,7 +106,7 @@ public class Tasklist {
             if (!inStoredTask) {
                 ui.taskAddedMessage(taskList, " deadline ");
             }
-        } catch (emptyCommandParameterException | ArrayIndexOutOfBoundsException  e) {
+        } catch (EmptyCommandParameterException | ArrayIndexOutOfBoundsException  e) {
             ui.deadlineDescriptionErrorMessage();
         }
     }
@@ -120,7 +122,7 @@ public class Tasklist {
         try {
             String find = line.split(" ", 2)[1];
             if (find.trim().isEmpty()){
-                throw new emptyCommandParameterException();
+                throw new EmptyCommandParameterException();
             }
             ArrayList<Task> filteredList = new ArrayList<>();
             int filteredIndex = 0;
@@ -137,7 +139,7 @@ public class Tasklist {
 
             }
             ui.dashLine();
-        } catch (ArrayIndexOutOfBoundsException| emptyCommandParameterException e) {
+        } catch (ArrayIndexOutOfBoundsException | EmptyCommandParameterException e) {
             ui.findIndexErrorMessage();
         }
 
@@ -158,7 +160,7 @@ public class Tasklist {
             if (!inStoredTask) {
                 ui.taskAddedMessage(taskList, " todo ");
             }
-        } catch (emptyCommandParameterException | ArrayIndexOutOfBoundsException e) {
+        } catch (EmptyCommandParameterException | ArrayIndexOutOfBoundsException e) {
             ui.todoDescriptionErrorMessage();
         }
     }
@@ -181,7 +183,7 @@ public class Tasklist {
                 taskList.get(taskNumber).setDone(false);
                 ui.handleUnmarkErrorMessage(taskList, taskNumber);
             }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | EmptyCommandParameterException e) {
             ui.errorHandleUnmark();
         }
     }
@@ -202,7 +204,7 @@ public class Tasklist {
                 taskList.get(taskNumber).setDone(true);
                 ui.handleMarkMessage(taskList, taskNumber);
             }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | EmptyCommandParameterException e) {
             ui.errorHandleMarkCommand();
         }
     }
@@ -226,7 +228,7 @@ public class Tasklist {
                 ui.handleDeleteMessage(taskList, taskNumber);
                 taskList.remove(taskNumber);
             }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | emptyCommandParameterException e) {
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | EmptyCommandParameterException e) {
             ui.errorHandleDelete();
         }
     }
@@ -234,7 +236,7 @@ public class Tasklist {
     /**
      * Starts a command loop which repeatedly parses user input to find and execute the associated command until exit
      * command "bye".
-     * @throws unspecifiedCommandException if a user input is different from set list of available commands
+     * @throws UnspecifiedCommandException if a user input is different from set list of available commands
      */
     public void runCommandLoopUntilExit(String line, Scanner in) {
         String command = parser.userCommand(line);
@@ -273,9 +275,9 @@ public class Tasklist {
                     handleFind(line);
                     break;
                 default:
-                    throw new unspecifiedCommandException();
+                    throw new UnspecifiedCommandException();
                 }
-            } catch (unspecifiedCommandException e) {
+            } catch (UnspecifiedCommandException e) {
                 ui.unspecifiedCommandErrorMessage();
             }
             line = in.nextLine();
