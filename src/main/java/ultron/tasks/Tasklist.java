@@ -30,7 +30,7 @@ public class Tasklist {
 
     public ArrayList<Task> taskList= new ArrayList<>();
 
-    
+
     /**
      * Handles the creation of a task of type event. This involves invoking the parser to obtain user parameters
      * for the event specified then creating a task of Event type and adding it to task list.
@@ -121,7 +121,7 @@ public class Tasklist {
     public void handleFind(String line) {
         try {
             String find = line.split(" ", 2)[1];
-            if (find.trim().isEmpty()){
+            if (find.trim().isEmpty()) {
                 throw new EmptyCommandParameterException();
             }
             ArrayList<Task> filteredList = new ArrayList<>();

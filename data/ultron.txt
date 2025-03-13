@@ -1,6 +1,9 @@
 
 D | /done 0 /description check 3 /by 2022-01-02
-T | /done 0 /description something else
 T | /done 0 /description this
-D | /done 0 /description of /by 2022-01-01
-E | /done 0 /description this /from then /to now
+D | /done 1 /description of /by 2022-01-01
+E | /done 1 /description this /from then /to now
+T | /done 0 /description osmething
+T | /done 0 /description test 1
+D | /done 0 /description test2 /by 2022-02-02
+E | /done 0 /description test3 /from then /to now

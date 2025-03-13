@@ -30,12 +30,18 @@ public class Parser {
         String eventDescription = line.split("/from ")[0].split("event", 2)[1].trim();
         String eventFrom = line.split("/from ")[1].split("/to ")[0];
         String eventTo = line.split("/from ")[1].split("/to ")[1];
-        if(eventDescription.trim().isEmpty()||eventTo.trim().isEmpty()||eventFrom.trim().isEmpty()){
+        if(eventDescription.trim().isEmpty()||eventTo.trim().isEmpty()||eventFrom.trim().isEmpty()) {
             throw new EmptyCommandParameterException();
         }
         return new Parser.EventParameters(eventDescription, eventFrom, eventTo);
     }
 
+    /**
+     * Stores important parameters needed to create an Event task
+     * @param eventDescription
+     * @param eventFrom
+     * @param eventTo
+     */
     public record EventParameters(String eventDescription, String eventFrom, String eventTo) {
     }
 
@@ -54,12 +60,17 @@ public class Parser {
         } catch (DateTimeParseException e) {
             throw new EmptyCommandParameterException();
         }
-        if(deadlineDescription.trim().isEmpty()||deadlineBy.trim().isEmpty()){
+        if(deadlineDescription.trim().isEmpty()||deadlineBy.trim().isEmpty()) {
             throw new EmptyCommandParameterException();
         }
         return new Parser.DeadlineParameters(deadlineDescription, deadlineBy);
     }
 
+    /**
+     * Stores important paramters needed to create a deadline task from user input
+     * @param deadlineDescription
+     * @param deadlineBy
+     */
     public record DeadlineParameters(String deadlineDescription, String deadlineBy) {
     }
 
